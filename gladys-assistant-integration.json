@@ -1,0 +1,1238 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "RadioPlayer",
+  "description": {
+    "en": "Play your country's web radios on your Google Cast, Sonos and DLNA speakers.",
+    "fr": "Écoutez les radios web de votre pays sur vos enceintes Google Cast, Sonos et DLNA.",
+    "de": "Webradios Ihres Landes auf Google-Cast-, Sonos- und DLNA-Lautsprechern hören.",
+    "es": "Escuche las radios web de su país en sus altavoces Google Cast, Sonos y DLNA."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-radioplayer:0.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/gboulvin/Gladys-RadioPlayer/main/cover.png",
+  "categories": ["multimedia"],
+  "keywords": [
+    "radio",
+    "webradio",
+    "Chromecast",
+    "Google Cast",
+    "Sonos",
+    "DLNA",
+    "UPnP",
+    "Nest",
+    "Radio Browser",
+    "streaming"
+  ],
+  "countries": [
+    "FR",
+    "BE",
+    "LU",
+    "CH",
+    "DE",
+    "AT",
+    "NL",
+    "GB",
+    "IE",
+    "ES",
+    "PT",
+    "IT",
+    "CA",
+    "US",
+    "MX",
+    "AR",
+    "CL",
+    "CO",
+    "PE",
+    "AU"
+  ],
+  "transports": ["local"],
+  "network_discovery": [
+    {
+      "type": "mdns",
+      "service": "_googlecast._tcp"
+    },
+    {
+      "type": "ssdp",
+      "st": "urn:schemas-upnp-org:device:MediaRenderer:1"
+    },
+    {
+      "type": "ssdp",
+      "st": "urn:schemas-upnp-org:device:ZonePlayer:1"
+    }
+  ],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "Pick your country: its radio catalog (from the free Radio Browser directory) feeds the music panel, the widgets and the scenes. Then open the Discovery tab to add your speakers. Internet access is needed for the catalog and the streams.",
+        "fr": "Choisissez votre pays : son catalogue de radios (annuaire gratuit Radio Browser) alimente le panneau musique, les widgets et les scènes. Ouvrez ensuite l’onglet Découverte pour ajouter vos enceintes. Un accès Internet est nécessaire pour le catalogue et les flux.",
+        "de": "Wählen Sie Ihr Land: Sein Radiokatalog (aus dem freien Verzeichnis Radio Browser) speist das Musik-Panel, die Widgets und die Szenen. Fügen Sie dann im Tab „Erkennung“ Ihre Lautsprecher hinzu. Für Katalog und Streams ist Internetzugang nötig.",
+        "es": "Elija su país: su catálogo de radios (del directorio gratuito Radio Browser) alimenta el panel de música, los widgets y las escenas. Después abra la pestaña Descubrimiento para añadir sus altavoces. Se necesita acceso a Internet para el catálogo y los flujos."
+      },
+      "links": [
+        {
+          "url": "https://www.radio-browser.info",
+          "label": {
+            "en": "Radio Browser directory",
+            "fr": "Annuaire Radio Browser",
+            "de": "Radio-Browser-Verzeichnis",
+            "es": "Directorio Radio Browser"
+          }
+        }
+      ]
+    },
+    {
+      "key": "country",
+      "type": "select",
+      "label": {
+        "en": "Catalog country",
+        "fr": "Pays du catalogue",
+        "de": "Katalogland",
+        "es": "País del catálogo"
+      },
+      "description": {
+        "en": "The stations offered are those of this country.",
+        "fr": "Les stations proposées sont celles de ce pays.",
+        "de": "Angeboten werden die Sender dieses Landes.",
+        "es": "Las emisoras ofrecidas son las de este país."
+      },
+      "required": true,
+      "default": "FR",
+      "options": [
+        {
+          "value": "FR",
+          "label": {
+            "en": "France",
+            "fr": "France",
+            "de": "Frankreich",
+            "es": "Francia"
+          }
+        },
+        {
+          "value": "BE",
+          "label": {
+            "en": "Belgium",
+            "fr": "Belgique",
+            "de": "Belgien",
+            "es": "Bélgica"
+          }
+        },
+        {
+          "value": "LU",
+          "label": {
+            "en": "Luxembourg",
+            "fr": "Luxembourg",
+            "de": "Luxemburg",
+            "es": "Luxemburgo"
+          }
+        },
+        {
+          "value": "CH",
+          "label": {
+            "en": "Switzerland",
+            "fr": "Suisse",
+            "de": "Schweiz",
+            "es": "Suiza"
+          }
+        },
+        {
+          "value": "DE",
+          "label": {
+            "en": "Germany",
+            "fr": "Allemagne",
+            "de": "Deutschland",
+            "es": "Alemania"
+          }
+        },
+        {
+          "value": "AT",
+          "label": {
+            "en": "Austria",
+            "fr": "Autriche",
+            "de": "Österreich",
+            "es": "Austria"
+          }
+        },
+        {
+          "value": "NL",
+          "label": {
+            "en": "Netherlands",
+            "fr": "Pays-Bas",
+            "de": "Niederlande",
+            "es": "Países Bajos"
+          }
+        },
+        {
+          "value": "GB",
+          "label": {
+            "en": "United Kingdom",
+            "fr": "Royaume-Uni",
+            "de": "Vereinigtes Königreich",
+            "es": "Reino Unido"
+          }
+        },
+        {
+          "value": "IE",
+          "label": {
+            "en": "Ireland",
+            "fr": "Irlande",
+            "de": "Irland",
+            "es": "Irlanda"
+          }
+        },
+        {
+          "value": "ES",
+          "label": {
+            "en": "Spain",
+            "fr": "Espagne",
+            "de": "Spanien",
+            "es": "España"
+          }
+        },
+        {
+          "value": "PT",
+          "label": {
+            "en": "Portugal",
+            "fr": "Portugal",
+            "de": "Portugal",
+            "es": "Portugal"
+          }
+        },
+        {
+          "value": "IT",
+          "label": {
+            "en": "Italy",
+            "fr": "Italie",
+            "de": "Italien",
+            "es": "Italia"
+          }
+        },
+        {
+          "value": "CA",
+          "label": {
+            "en": "Canada",
+            "fr": "Canada",
+            "de": "Kanada",
+            "es": "Canadá"
+          }
+        },
+        {
+          "value": "US",
+          "label": {
+            "en": "United States",
+            "fr": "États-Unis",
+            "de": "Vereinigte Staaten",
+            "es": "Estados Unidos"
+          }
+        },
+        {
+          "value": "MX",
+          "label": {
+            "en": "Mexico",
+            "fr": "Mexique",
+            "de": "Mexiko",
+            "es": "México"
+          }
+        },
+        {
+          "value": "AR",
+          "label": {
+            "en": "Argentina",
+            "fr": "Argentine",
+            "de": "Argentinien",
+            "es": "Argentina"
+          }
+        },
+        {
+          "value": "CL",
+          "label": {
+            "en": "Chile",
+            "fr": "Chili",
+            "de": "Chile",
+            "es": "Chile"
+          }
+        },
+        {
+          "value": "CO",
+          "label": {
+            "en": "Colombia",
+            "fr": "Colombie",
+            "de": "Kolumbien",
+            "es": "Colombia"
+          }
+        },
+        {
+          "value": "PE",
+          "label": {
+            "en": "Peru",
+            "fr": "Pérou",
+            "de": "Peru",
+            "es": "Perú"
+          }
+        },
+        {
+          "value": "AU",
+          "label": {
+            "en": "Australia",
+            "fr": "Australie",
+            "de": "Australien",
+            "es": "Australia"
+          }
+        }
+      ]
+    },
+    {
+      "key": "start_volume",
+      "type": "number",
+      "label": {
+        "en": "Start volume (%)",
+        "fr": "Volume au démarrage (%)",
+        "de": "Startlautstärke (%)",
+        "es": "Volumen inicial (%)"
+      },
+      "description": {
+        "en": "Volume set when a station starts. 0 keeps the volume of the speaker.",
+        "fr": "Volume réglé au lancement d'une station. 0 garde le volume de l'enceinte.",
+        "de": "Lautstärke beim Start eines Senders. 0 behält die Lautstärke des Lautsprechers.",
+        "es": "Volumen al iniciar una emisora. 0 mantiene el volumen del altavoz."
+      },
+      "placeholder": {
+        "en": "e.g. 30",
+        "fr": "ex. 30",
+        "de": "z. B. 30",
+        "es": "p. ej. 30"
+      },
+      "required": false,
+      "default": 0,
+      "min": 0,
+      "max": 100
+    },
+    {
+      "key": "exclude_hls",
+      "type": "boolean",
+      "label": {
+        "en": "Hide HLS streams",
+        "fr": "Masquer les flux HLS",
+        "de": "HLS-Streams ausblenden",
+        "es": "Ocultar flujos HLS"
+      },
+      "description": {
+        "en": "Many DLNA speakers cannot play HLS (.m3u8) streams: keep it on unless all your speakers are Google Cast.",
+        "fr": "Beaucoup d’enceintes DLNA ne lisent pas les flux HLS (.m3u8) : laissez activé sauf si toutes vos enceintes sont Google Cast.",
+        "de": "Viele DLNA-Lautsprecher spielen keine HLS-Streams (.m3u8): aktiviert lassen, außer alle Lautsprecher sind Google Cast.",
+        "es": "Muchos altavoces DLNA no reproducen flujos HLS (.m3u8): déjelo activado salvo que todos sean Google Cast."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "discovery",
+      "type": "section",
+      "label": {
+        "en": "Speakers",
+        "fr": "Enceintes",
+        "de": "Lautsprecher",
+        "es": "Altavoces"
+      },
+      "description": {
+        "en": "Gladys looks for the speakers on your local network. The speaker downloads the stream itself: no audio goes through Gladys.",
+        "fr": "Gladys cherche les enceintes sur votre réseau local. L’enceinte télécharge le flux elle-même : aucun son ne passe par Gladys.",
+        "de": "Gladys sucht die Lautsprecher in Ihrem lokalen Netzwerk. Der Lautsprecher lädt den Stream selbst: Kein Ton läuft über Gladys.",
+        "es": "Gladys busca los altavoces en su red local. El altavoz descarga el flujo por sí mismo: ningún sonido pasa por Gladys."
+      }
+    },
+    {
+      "key": "enable_cast",
+      "type": "boolean",
+      "label": {
+        "en": "Google Cast speakers",
+        "fr": "Enceintes Google Cast",
+        "de": "Google-Cast-Lautsprecher",
+        "es": "Altavoces Google Cast"
+      },
+      "description": {
+        "en": "Chromecast, Google Nest, Android TV and speakers with Chromecast built-in.",
+        "fr": "Chromecast, Google Nest, Android TV et enceintes avec Chromecast intégré.",
+        "de": "Chromecast, Google Nest, Android TV und Lautsprecher mit integriertem Chromecast.",
+        "es": "Chromecast, Google Nest, Android TV y altavoces con Chromecast integrado."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "enable_upnp",
+      "type": "boolean",
+      "label": {
+        "en": "Sonos and UPnP/DLNA speakers",
+        "fr": "Enceintes Sonos et UPnP/DLNA",
+        "de": "Sonos- und UPnP/DLNA-Lautsprecher",
+        "es": "Altavoces Sonos y UPnP/DLNA"
+      },
+      "description": {
+        "en": "Sonos, network receivers, smart TVs, Freebox Player, Kodi and other DLNA renderers.",
+        "fr": "Sonos, amplis réseau, téléviseurs, Freebox Player, Kodi et autres lecteurs DLNA.",
+        "de": "Sonos, Netzwerk-Receiver, Smart-TVs, Kodi und andere DLNA-Renderer.",
+        "es": "Sonos, receptores de red, televisores, Kodi y otros reproductores DLNA."
+      },
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "manual_players",
+      "type": "string",
+      "label": {
+        "en": "Speakers added by hand",
+        "fr": "Enceintes ajoutées à la main",
+        "de": "Manuell hinzugefügte Lautsprecher",
+        "es": "Altavoces añadidos a mano"
+      },
+      "description": {
+        "en": "For a speaker the scan does not find: the IP address of a Google Cast device, or the URL of a UPnP description. Separate several entries with commas.",
+        "fr": "Pour une enceinte que la recherche ne trouve pas : l'adresse IP d'un appareil Google Cast, ou l'URL d'une description UPnP. Séparez plusieurs entrées par des virgules.",
+        "de": "Für einen Lautsprecher, den die Suche nicht findet: die IP-Adresse eines Google-Cast-Geräts oder die URL einer UPnP-Beschreibung. Mehrere Einträge mit Kommas trennen.",
+        "es": "Para un altavoz que la búsqueda no encuentra: la dirección IP de un dispositivo Google Cast o la URL de una descripción UPnP. Separe varias entradas con comas."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.20, http://192.168.1.30:1400/xml/device_description.xml",
+        "fr": "ex. 192.168.1.20, http://192.168.1.30:1400/xml/device_description.xml",
+        "de": "z. B. 192.168.1.20, http://192.168.1.30:1400/xml/device_description.xml",
+        "es": "p. ej. 192.168.1.20, http://192.168.1.30:1400/xml/device_description.xml"
+      },
+      "required": false,
+      "default": ""
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_catalog",
+      "label": {
+        "en": "Test the radio catalog",
+        "fr": "Tester le catalogue des radios",
+        "de": "Radiokatalog testen",
+        "es": "Probar el catálogo de radios"
+      },
+      "timeout_seconds": 30
+    },
+    {
+      "key": "test_player",
+      "label": {
+        "en": "Test a speaker",
+        "fr": "Tester une enceinte",
+        "de": "Lautsprecher testen",
+        "es": "Probar un altavoz"
+      },
+      "timeout_seconds": 20,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "key": "add_favorite",
+      "label": {
+        "en": "Add a favorite",
+        "fr": "Ajouter un favori",
+        "de": "Favorit hinzufügen",
+        "es": "Añadir un favorito"
+      },
+      "timeout_seconds": 20,
+      "fields": [
+        {
+          "key": "station",
+          "type": "string",
+          "label": {
+            "en": "Station",
+            "fr": "Station",
+            "de": "Sender",
+            "es": "Emisora"
+          },
+          "description": {
+            "en": "Name of the station (or its Radio Browser identifier), searched in the catalog of the configured country.",
+            "fr": "Nom de la station (ou son identifiant Radio Browser), cherché dans le catalogue du pays configuré.",
+            "de": "Name des Senders (oder seine Radio-Browser-ID), gesucht im Katalog des eingestellten Landes.",
+            "es": "Nombre de la emisora (o su identificador de Radio Browser), buscado en el catálogo del país configurado."
+          },
+          "placeholder": {
+            "en": "e.g. France Inter",
+            "fr": "ex. France Inter",
+            "de": "z. B. Deutschlandfunk",
+            "es": "p. ej. Cadena SER"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "key": "remove_favorite",
+      "label": {
+        "en": "Remove a favorite",
+        "fr": "Retirer un favori",
+        "de": "Favorit entfernen",
+        "es": "Quitar un favorito"
+      },
+      "fields": [
+        {
+          "key": "station",
+          "type": "string",
+          "label": {
+            "en": "Station",
+            "fr": "Station",
+            "de": "Sender",
+            "es": "Emisora"
+          },
+          "description": {
+            "en": "Name of the favorite to remove.",
+            "fr": "Nom du favori à retirer.",
+            "de": "Name des zu entfernenden Favoriten.",
+            "es": "Nombre del favorito a quitar."
+          },
+          "placeholder": {
+            "en": "e.g. France Inter",
+            "fr": "ex. France Inter",
+            "de": "z. B. Deutschlandfunk",
+            "es": "p. ej. Cadena SER"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "key": "list_favorites",
+      "label": {
+        "en": "List the favorites",
+        "fr": "Lister les favoris",
+        "de": "Favoriten anzeigen",
+        "es": "Ver los favoritos"
+      }
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "playback_started",
+      "label": {
+        "en": "Radio started",
+        "fr": "Radio lancée",
+        "de": "Radio gestartet",
+        "es": "Radio iniciada"
+      },
+      "description": {
+        "en": "A speaker starts playing (from Gladys, its app or its buttons).",
+        "fr": "Une enceinte se met à jouer (depuis Gladys, son appli ou ses boutons).",
+        "de": "Ein Lautsprecher beginnt zu spielen (über Gladys, seine App oder Tasten).",
+        "es": "Un altavoz empieza a sonar (desde Gladys, su app o sus botones)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "player",
+          "type": "string",
+          "label": {
+            "en": "Player name",
+            "fr": "Nom du lecteur",
+            "de": "Name des Players",
+            "es": "Nombre del reproductor"
+          }
+        },
+        {
+          "key": "station",
+          "type": "string",
+          "label": {
+            "en": "Station name",
+            "fr": "Nom de la station",
+            "de": "Sendername",
+            "es": "Nombre de la emisora"
+          }
+        },
+        {
+          "key": "station_uuid",
+          "type": "string",
+          "label": {
+            "en": "Station identifier",
+            "fr": "Identifiant de la station",
+            "de": "Sender-ID",
+            "es": "Identificador de la emisora"
+          }
+        }
+      ]
+    },
+    {
+      "key": "playback_stopped",
+      "label": {
+        "en": "Radio stopped",
+        "fr": "Radio arrêtée",
+        "de": "Radio gestoppt",
+        "es": "Radio detenida"
+      },
+      "description": {
+        "en": "A speaker stops playing, or the stream ended.",
+        "fr": "Une enceinte s'arrête de jouer, ou le flux s'est interrompu.",
+        "de": "Ein Lautsprecher hört auf zu spielen oder der Stream ist abgebrochen.",
+        "es": "Un altavoz deja de sonar o el flujo se ha cortado."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "player",
+          "type": "string",
+          "label": {
+            "en": "Player name",
+            "fr": "Nom du lecteur",
+            "de": "Name des Players",
+            "es": "Nombre del reproductor"
+          }
+        },
+        {
+          "key": "station",
+          "type": "string",
+          "label": {
+            "en": "Station name",
+            "fr": "Nom de la station",
+            "de": "Sendername",
+            "es": "Nombre de la emisora"
+          }
+        },
+        {
+          "key": "station_uuid",
+          "type": "string",
+          "label": {
+            "en": "Station identifier",
+            "fr": "Identifiant de la station",
+            "de": "Sender-ID",
+            "es": "Identificador de la emisora"
+          }
+        }
+      ]
+    },
+    {
+      "key": "player_unreachable",
+      "label": {
+        "en": "Speaker unreachable",
+        "fr": "Enceinte injoignable",
+        "de": "Lautsprecher nicht erreichbar",
+        "es": "Altavoz inaccesible"
+      },
+      "description": {
+        "en": "A speaker no longer answers on the network.",
+        "fr": "Une enceinte ne répond plus sur le réseau.",
+        "de": "Ein Lautsprecher antwortet nicht mehr im Netzwerk.",
+        "es": "Un altavoz ya no responde en la red."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "player",
+          "type": "string",
+          "label": {
+            "en": "Player name",
+            "fr": "Nom du lecteur",
+            "de": "Name des Players",
+            "es": "Nombre del reproductor"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "play_station",
+      "label": {
+        "en": "Play a radio station",
+        "fr": "Lancer une radio",
+        "de": "Radiosender abspielen",
+        "es": "Reproducir una emisora"
+      },
+      "description": {
+        "en": "Searches the station in the country catalog and plays it on a speaker.",
+        "fr": "Cherche la station dans le catalogue du pays et la lance sur une enceinte.",
+        "de": "Sucht den Sender im Landeskatalog und spielt ihn auf einem Lautsprecher.",
+        "es": "Busca la emisora en el catálogo del país y la reproduce en un altavoz."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        },
+        {
+          "key": "station",
+          "type": "string",
+          "label": {
+            "en": "Station",
+            "fr": "Station",
+            "de": "Sender",
+            "es": "Emisora"
+          },
+          "description": {
+            "en": "Name of the station (or its Radio Browser identifier), searched in the catalog of the configured country.",
+            "fr": "Nom de la station (ou son identifiant Radio Browser), cherché dans le catalogue du pays configuré.",
+            "de": "Name des Senders (oder seine Radio-Browser-ID), gesucht im Katalog des eingestellten Landes.",
+            "es": "Nombre de la emisora (o su identificador de Radio Browser), buscado en el catálogo del país configurado."
+          },
+          "placeholder": {
+            "en": "e.g. France Inter",
+            "fr": "ex. France Inter",
+            "de": "z. B. Deutschlandfunk",
+            "es": "p. ej. Cadena SER"
+          },
+          "required": true
+        },
+        {
+          "key": "volume",
+          "type": "number",
+          "label": {
+            "en": "Volume (%)",
+            "fr": "Volume (%)",
+            "de": "Lautstärke (%)",
+            "es": "Volumen (%)"
+          },
+          "description": {
+            "en": "Optional. Empty keeps the configured start volume.",
+            "fr": "Facultatif. Vide : volume de démarrage de la configuration.",
+            "de": "Optional. Leer: Startlautstärke der Konfiguration.",
+            "es": "Opcional. Vacío: volumen inicial de la configuración."
+          },
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "outputs": [
+        {
+          "key": "started",
+          "type": "boolean",
+          "label": {
+            "en": "Radio started",
+            "fr": "Radio lancée",
+            "de": "Radio gestartet",
+            "es": "Radio iniciada"
+          }
+        },
+        {
+          "key": "station_name",
+          "type": "string",
+          "label": {
+            "en": "Station name",
+            "fr": "Nom de la station",
+            "de": "Sendername",
+            "es": "Nombre de la emisora"
+          }
+        },
+        {
+          "key": "station_uuid",
+          "type": "string",
+          "label": {
+            "en": "Station identifier",
+            "fr": "Identifiant de la station",
+            "de": "Sender-ID",
+            "es": "Identificador de la emisora"
+          }
+        }
+      ]
+    },
+    {
+      "key": "play_favorite",
+      "label": {
+        "en": "Play a favorite",
+        "fr": "Lancer un favori",
+        "de": "Favorit abspielen",
+        "es": "Reproducir un favorito"
+      },
+      "description": {
+        "en": "Plays the favorite at this position (1 = the first one).",
+        "fr": "Lance le favori à cette position (1 = le premier).",
+        "de": "Spielt den Favoriten an dieser Position (1 = der erste).",
+        "es": "Reproduce el favorito en esta posición (1 = el primero)."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        },
+        {
+          "key": "position",
+          "type": "number",
+          "label": {
+            "en": "Position",
+            "fr": "Position",
+            "de": "Position",
+            "es": "Posición"
+          },
+          "required": true,
+          "default": 1,
+          "min": 1,
+          "max": 30
+        },
+        {
+          "key": "volume",
+          "type": "number",
+          "label": {
+            "en": "Volume (%)",
+            "fr": "Volume (%)",
+            "de": "Lautstärke (%)",
+            "es": "Volumen (%)"
+          },
+          "description": {
+            "en": "Optional. Empty keeps the configured start volume.",
+            "fr": "Facultatif. Vide : volume de démarrage de la configuration.",
+            "de": "Optional. Leer: Startlautstärke der Konfiguration.",
+            "es": "Opcional. Vacío: volumen inicial de la configuración."
+          },
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "outputs": [
+        {
+          "key": "started",
+          "type": "boolean",
+          "label": {
+            "en": "Radio started",
+            "fr": "Radio lancée",
+            "de": "Radio gestartet",
+            "es": "Radio iniciada"
+          }
+        },
+        {
+          "key": "station_name",
+          "type": "string",
+          "label": {
+            "en": "Station name",
+            "fr": "Nom de la station",
+            "de": "Sendername",
+            "es": "Nombre de la emisora"
+          }
+        },
+        {
+          "key": "station_uuid",
+          "type": "string",
+          "label": {
+            "en": "Station identifier",
+            "fr": "Identifiant de la station",
+            "de": "Sender-ID",
+            "es": "Identificador de la emisora"
+          }
+        }
+      ]
+    },
+    {
+      "key": "next_station",
+      "label": {
+        "en": "Next station",
+        "fr": "Station suivante",
+        "de": "Nächster Sender",
+        "es": "Emisora siguiente"
+      },
+      "description": {
+        "en": "Switches to the next favorite (or the next top station of the country).",
+        "fr": "Passe au favori suivant (ou à la station du top suivante).",
+        "de": "Wechselt zum nächsten Favoriten (oder zum nächsten Top-Sender).",
+        "es": "Pasa al favorito siguiente (o a la siguiente emisora del top)."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "started",
+          "type": "boolean",
+          "label": {
+            "en": "Radio started",
+            "fr": "Radio lancée",
+            "de": "Radio gestartet",
+            "es": "Radio iniciada"
+          }
+        },
+        {
+          "key": "station_name",
+          "type": "string",
+          "label": {
+            "en": "Station name",
+            "fr": "Nom de la station",
+            "de": "Sendername",
+            "es": "Nombre de la emisora"
+          }
+        },
+        {
+          "key": "station_uuid",
+          "type": "string",
+          "label": {
+            "en": "Station identifier",
+            "fr": "Identifiant de la station",
+            "de": "Sender-ID",
+            "es": "Identificador de la emisora"
+          }
+        }
+      ]
+    },
+    {
+      "key": "stop_radio",
+      "label": {
+        "en": "Stop the radio",
+        "fr": "Arrêter la radio",
+        "de": "Radio stoppen",
+        "es": "Detener la radio"
+      },
+      "timeout_seconds": 20,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "stopped",
+          "type": "boolean",
+          "label": {
+            "en": "Stopped",
+            "fr": "Arrêtée",
+            "de": "Gestoppt",
+            "es": "Detenida"
+          }
+        }
+      ]
+    }
+  ],
+  "music": {
+    "browse": true,
+    "search": true,
+    "queue": false,
+    "append": false
+  },
+  "widgets": [
+    {
+      "key": "now_playing",
+      "label": {
+        "en": "Radio – now playing",
+        "fr": "Radio en cours",
+        "de": "Radio – läuft gerade",
+        "es": "Radio – sonando"
+      },
+      "description": {
+        "en": "The station of a speaker, its logo, zapping buttons and a favorite star.",
+        "fr": "La station d'une enceinte, son logo, le zapping et l'étoile favori.",
+        "de": "Der Sender eines Lautsprechers, Logo, Senderwechsel und Favoritenstern.",
+        "es": "La emisora de un altavoz, su logo, cambio de emisora y estrella favorito."
+      },
+      "icon": "radio",
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        }
+      ],
+      "action_timeout_seconds": 30
+    },
+    {
+      "key": "radio_presets",
+      "label": {
+        "en": "Radio presets",
+        "fr": "Radios préférées",
+        "de": "Radio-Presets",
+        "es": "Radios favoritas"
+      },
+      "description": {
+        "en": "Up to three one-tap stations for a speaker, and a Stop button.",
+        "fr": "Jusqu'à trois radios en un geste pour une enceinte, et un bouton Arrêter.",
+        "de": "Bis zu drei Sender per Fingertipp für einen Lautsprecher, plus Stopp.",
+        "es": "Hasta tres emisoras con un toque para un altavoz y un botón Detener."
+      },
+      "icon": "list",
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        },
+        {
+          "key": "preset_1",
+          "type": "string",
+          "label": {
+            "en": "Station 1",
+            "fr": "Station 1",
+            "de": "Sender 1",
+            "es": "Emisora 1"
+          },
+          "placeholder": {
+            "en": "e.g. France Inter",
+            "fr": "ex. France Inter",
+            "de": "z. B. Deutschlandfunk",
+            "es": "p. ej. Cadena SER"
+          },
+          "required": true
+        },
+        {
+          "key": "preset_2",
+          "type": "string",
+          "label": {
+            "en": "Station 2",
+            "fr": "Station 2",
+            "de": "Sender 2",
+            "es": "Emisora 2"
+          },
+          "placeholder": {
+            "en": "e.g. France Inter",
+            "fr": "ex. France Inter",
+            "de": "z. B. Deutschlandfunk",
+            "es": "p. ej. Cadena SER"
+          },
+          "required": false
+        },
+        {
+          "key": "preset_3",
+          "type": "string",
+          "label": {
+            "en": "Station 3",
+            "fr": "Station 3",
+            "de": "Sender 3",
+            "es": "Emisora 3"
+          },
+          "placeholder": {
+            "en": "e.g. France Inter",
+            "fr": "ex. France Inter",
+            "de": "z. B. Deutschlandfunk",
+            "es": "p. ej. Cadena SER"
+          },
+          "required": false
+        }
+      ],
+      "action_timeout_seconds": 30
+    },
+    {
+      "key": "top_stations",
+      "label": {
+        "en": "Top radio stations",
+        "fr": "Top des radios",
+        "de": "Top-Radiosender",
+        "es": "Top de radios"
+      },
+      "description": {
+        "en": "The most listened stations of the catalog country, or of one genre.",
+        "fr": "Les stations les plus écoutées du pays, ou d’un genre.",
+        "de": "Die meistgehörten Sender des Landes oder eines Genres.",
+        "es": "Las emisoras más escuchadas del país o de un género."
+      },
+      "icon": "trending-up",
+      "settings": [
+        {
+          "key": "genre",
+          "type": "select",
+          "label": {
+            "en": "Genre",
+            "fr": "Genre",
+            "de": "Genre",
+            "es": "Género"
+          },
+          "required": false,
+          "options": [
+            {
+              "value": "news",
+              "label": {
+                "en": "News",
+                "fr": "Info",
+                "de": "Nachrichten",
+                "es": "Noticias"
+              }
+            },
+            {
+              "value": "talk",
+              "label": {
+                "en": "Talk",
+                "fr": "Talk & débats",
+                "de": "Talk",
+                "es": "Tertulias"
+              }
+            },
+            {
+              "value": "pop",
+              "label": {
+                "en": "Pop",
+                "fr": "Pop",
+                "de": "Pop",
+                "es": "Pop"
+              }
+            },
+            {
+              "value": "rock",
+              "label": {
+                "en": "Rock",
+                "fr": "Rock",
+                "de": "Rock",
+                "es": "Rock"
+              }
+            },
+            {
+              "value": "oldies",
+              "label": {
+                "en": "Oldies",
+                "fr": "Années 60-80",
+                "de": "Oldies",
+                "es": "Clásicos"
+              }
+            },
+            {
+              "value": "jazz",
+              "label": {
+                "en": "Jazz",
+                "fr": "Jazz",
+                "de": "Jazz",
+                "es": "Jazz"
+              }
+            },
+            {
+              "value": "classical",
+              "label": {
+                "en": "Classical",
+                "fr": "Classique",
+                "de": "Klassik",
+                "es": "Clásica"
+              }
+            },
+            {
+              "value": "electronic",
+              "label": {
+                "en": "Electronic",
+                "fr": "Électro",
+                "de": "Elektronisch",
+                "es": "Electrónica"
+              }
+            },
+            {
+              "value": "hip hop",
+              "label": {
+                "en": "Hip-hop",
+                "fr": "Hip-hop",
+                "de": "Hip-Hop",
+                "es": "Hip-hop"
+              }
+            },
+            {
+              "value": "sport",
+              "label": {
+                "en": "Sport",
+                "fr": "Sport",
+                "de": "Sport",
+                "es": "Deportes"
+              }
+            },
+            {
+              "value": "kids",
+              "label": {
+                "en": "Kids",
+                "fr": "Enfants",
+                "de": "Kinder",
+                "es": "Infantil"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
