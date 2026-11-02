@@ -10,8 +10,6 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-11-02
-
 ### Added
 
 - First release of RadioPlayer: the web radios of your country on your Google
@@ -35,5 +33,4 @@ the notes of the version's GitHub Release.
 - English, French, German and Spanish everywhere: configuration, messages,
   widgets and documentation.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/gboulvin/Gladys-RadioPlayer/releases/tag/v1.0.0
+[Unreleased]: https://github.com/gboulvin/Gladys-RadioPlayer/commits/main
