@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-04
+
 ### Added
 
 - **Search for speakers** button in the Configuration screen: scans the
@@ -62,5 +64,6 @@ the notes of the version's GitHub Release.
 - English, French, German and Spanish everywhere: configuration, messages,
   widgets and documentation.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/gboulvin/Gladys-RadioPlayer/releases/tag/v1.0.0
