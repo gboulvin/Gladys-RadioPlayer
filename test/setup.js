@@ -24,13 +24,19 @@ export const MDNS_ANSWER = {
   txt: ['id=0123456789abcdef', 'fn=Cuisine', 'md=Google Nest Mini'],
 };
 
-export async function setup({ scanResults, configOverrides = {}, timers = [] } = {}) {
+export async function setup({
+  scanResults,
+  configOverrides = {},
+  timers = [],
+  cast: castOptions,
+  streams,
+} = {}) {
   const gladys = createFakeGladys({
     scanResults: scanResults ?? { ssdp: [SSDP_ANSWER], mdns: [MDNS_ANSWER] },
   });
   const renderer = fakeUpnpRenderer();
-  const cast = fakeCastDevice();
-  const catalogFetch = fakeRadioBrowserFetch();
+  const cast = fakeCastDevice(castOptions);
+  const catalogFetch = fakeRadioBrowserFetch({ streams });
   const catalog = new RadioBrowserClient({ fetch: catalogFetch.fetch });
   const store = tempStore();
   await store.load();

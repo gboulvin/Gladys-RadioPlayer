@@ -48,6 +48,10 @@ What the integration does, so a reviewer knows what to look at:
     search and the play counter;
   - HTTP to the station logos, for the dashboard widgets — downloaded with a
     timeout, at most 300 KB, served only when they are PNG, JPEG or WebP;
+  - HTTP(S) to the stream servers of the stations, to find the MP3 version
+    of a station: only the response headers are read (the body is cancelled,
+    3 s timeout), and a guessed URL always stays on the host of the original
+    stream;
   - unicast to the speakers of the LAN: UPnP SOAP over HTTP, Google Cast over
     TLS on port 8009.
 - **Discovery** goes through the Gladys core (`network_discovery` in the

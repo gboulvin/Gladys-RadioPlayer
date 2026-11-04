@@ -10,6 +10,21 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- **Prefer MP3 streams** option, on by default: when a station is published
+  in AAC or Ogg, RadioPlayer looks for its MP3 version (another entry of the
+  same radio in the directory, or the parallel MP3 mount of the same server)
+  and plays it first, the original stream staying the fallback.
+
+### Fixed
+
+- Android TV (Google Cast) showed "incompatible file format" on raw AAC
+  streams, e.g. Classic 21 Metal: the MP3 version of the station now plays.
+- A stream a speaker accepts then drops (unsupported format) is detected a
+  few seconds after the start, and the next stream of the station is tried,
+  without firing the "Radio stopped" trigger.
+
 ## [1.1.0] - 2026-11-04
 
 ### Added

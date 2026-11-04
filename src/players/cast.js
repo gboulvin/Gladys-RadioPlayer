@@ -278,7 +278,7 @@ export class CastPlayer extends EventEmitter {
   async play(station, { volume } = {}) {
     logger.info(`${this.name}: playing ${station.name} (${station.url})`);
     const app = await this.launchMediaReceiver();
-    await this.request(NAMESPACES.MEDIA, app.transportId, {
+    const answer = await this.request(NAMESPACES.MEDIA, app.transportId, {
       type: 'LOAD',
       autoplay: true,
       currentTime: 0,
@@ -294,6 +294,10 @@ export class CastPlayer extends EventEmitter {
         },
       },
     });
+    const media = (answer.status ?? [])[0];
+    if (media?.playerState === 'IDLE' && media.idleReason === 'ERROR') {
+      throw new Error(`${this.name}: stream format not supported`);
+    }
     if (volume > 0) {
       await this.setVolume(volume).catch((err) => logger.warn(err.message));
     }
@@ -367,6 +371,11 @@ export class CastPlayer extends EventEmitter {
     if (app) {
       const media = await this.mediaStatus(app).catch(() => null);
       result.state = MEDIA_STATES[media?.playerState] ?? 'IDLE';
+      // The receiver gave up on the stream (unsupported format, unreachable
+      // URL): Android TV shows "incompatible file format" in this case.
+      if (media?.playerState === 'IDLE' && media.idleReason === 'ERROR') {
+        result.error = 'stream not supported by the speaker';
+      }
     }
     return result;
   }

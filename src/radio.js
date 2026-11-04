@@ -12,6 +12,7 @@
 // -----------------------------------------------------------------------------
 
 import { createLogger, MUSIC_PLAYBACK_STATE } from '@gladysassistant/integration-sdk';
+import { isMp3 } from './catalog/radioBrowser.js';
 import { FEATURES } from './devices.js';
 
 const logger = createLogger({ name: 'radio' });
@@ -31,6 +32,8 @@ const SCENE_ORIGIN_SILENCE_MS = 30 * 1000;
 // buffer the stream, and the poll would only see it up to 15 s later.
 const SETTLE_DELAY_MS = 4000;
 const ZAPPING_LIST_SIZE = 20;
+// How long after a play an idle / error status means "this stream failed".
+const ATTEMPT_WINDOW_MS = 30 * 1000;
 
 const playing = (state) => state === 'PLAYING' || state === 'BUFFERING';
 
@@ -81,6 +84,7 @@ export class RadioService {
     if (!this.players.has(deviceExternalId)) {
       this.players.set(deviceExternalId, {
         station: null,
+        attempt: null,
         state: null,
         failures: 0,
         sceneOriginUntil: 0,
@@ -121,15 +125,79 @@ export class RadioService {
     if (fromScene) {
       entry.sceneOriginUntil = Date.now() + SCENE_ORIGIN_SILENCE_MS;
     }
-    await player.play(station, { volume: volume ?? this.config.start_volume });
-    entry.station = station;
+    const streams = await this.streamsFor(station);
+    const options = { volume: volume ?? this.config.start_volume };
+    let lastError;
+    for (let i = 0; i < streams.length; i += 1) {
+      try {
+        await player.play(streams[i], options);
+        return await this.started(deviceExternalId, streams[i], streams.slice(i + 1), options);
+      } catch (err) {
+        lastError = err;
+        logger.warn(`${player.name} refused ${streams[i].url}: ${err.message}`);
+      }
+    }
+    throw lastError;
+  }
+
+  /**
+   * The streams to try for a station, in order. Many speakers only decode
+   * MP3 reliably (an Android TV refuses raw AAC, old DLNA renderers refuse
+   * AAC or Ogg): unless the user opted out, an MP3 version of the same radio
+   * goes first, the original stream stays as the fallback.
+   */
+  async streamsFor(station) {
+    if (!this.config.prefer_mp3 || isMp3(station)) {
+      return [station];
+    }
+    const variants = await this.catalog.mp3Variants(station).catch(() => []);
+    return [...variants, station];
+  }
+
+  async started(deviceExternalId, stream, fallbacks, options) {
+    const entry = this.entry(deviceExternalId);
+    entry.station = stream;
+    // Watched until the speaker is seen playing: a stream it accepted but
+    // cannot decode shows up as an error / idle state a few seconds later.
+    entry.attempt = { fallbacks, options, until: Date.now() + ATTEMPT_WINDOW_MS };
     // A command is a known starting point: nothing played before it.
     entry.state = entry.state ?? 'IDLE';
-    await this.store.recordPlay(deviceExternalId, station);
-    this.catalog.countClick(station.uuid);
+    await this.store.recordPlay(deviceExternalId, stream);
+    this.catalog.countClick(stream.uuid);
     await this.publish(deviceExternalId, 'BUFFERING', { stationChanged: true });
     this.schedule(() => this.refresh(deviceExternalId), SETTLE_DELAY_MS);
-    return station;
+    return stream;
+  }
+
+  /**
+   * The speaker gave up on a stream it had accepted: play the next stream of
+   * the same station. Returns true when a fallback started.
+   */
+  async fallback(deviceExternalId, status) {
+    const entry = this.entry(deviceExternalId);
+    const { attempt } = entry;
+    entry.attempt = null;
+    const player = await this.registry.resolve(this.gladys, deviceExternalId);
+    const failed = entry.station?.url;
+    for (let i = 0; i < attempt.fallbacks.length; i += 1) {
+      const stream = attempt.fallbacks[i];
+      logger.warn(
+        `${player.name} could not play ${failed}${status.error ? ` (${status.error})` : ''}, trying ${stream.url}`,
+      );
+      try {
+        await player.play(stream, attempt.options);
+        await this.started(
+          deviceExternalId,
+          stream,
+          attempt.fallbacks.slice(i + 1),
+          attempt.options,
+        );
+        return true;
+      } catch (err) {
+        logger.warn(`${player.name} refused ${stream.url}: ${err.message}`);
+      }
+    }
+    return false;
   }
 
   /** Play what a user typed: a station uuid or name, searched in the country catalog. */
@@ -155,6 +223,7 @@ export class RadioService {
   async stop(deviceExternalId, { fromScene = false } = {}) {
     const player = await this.registry.resolve(this.gladys, deviceExternalId);
     const entry = this.entry(deviceExternalId);
+    entry.attempt = null;
     if (fromScene) {
       entry.sceneOriginUntil = Date.now() + SCENE_ORIGIN_SILENCE_MS;
     }
@@ -183,8 +252,10 @@ export class RadioService {
         return;
       }
     } else if (value === MUSIC_PLAYBACK_STATE.PAUSED) {
+      this.entry(deviceExternalId).attempt = null;
       await player.pause();
     } else {
+      this.entry(deviceExternalId).attempt = null;
       await player.stop();
     }
     await this.refresh(deviceExternalId);
@@ -259,6 +330,21 @@ export class RadioService {
     }
     entry.failures = 0;
     entry.unreachable = false;
+    const { attempt } = entry;
+    if (attempt) {
+      // An idle speaker only means "refused" on the first read after the
+      // play: later, it may just be someone stopping it from its own app.
+      const failed = Boolean(status.error) || (status.state === 'IDLE' && !attempt.checked);
+      attempt.checked = true;
+      if (failed && Date.now() < attempt.until && attempt.fallbacks.length > 0) {
+        if (await this.fallback(deviceExternalId, status)) {
+          return status;
+        }
+      } else if (status.state === 'PLAYING' || Date.now() >= attempt.until) {
+        // Seen playing (or long enough): the stream is fine.
+        entry.attempt = null;
+      }
+    }
     await this.publish(deviceExternalId, status.state, status);
     return status;
   }

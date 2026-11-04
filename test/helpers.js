@@ -55,11 +55,22 @@ export function jsonResponse(body, status = 200) {
  * A fake fetch for the Radio Browser API: records the requested URLs and
  * answers from the fixtures.
  */
-export function fakeRadioBrowserFetch({ stations = STATIONS, failServers = [] } = {}) {
+export function fakeRadioBrowserFetch({
+  stations = STATIONS,
+  failServers = [],
+  streams = {},
+} = {}) {
   const calls = [];
   const fetchImpl = async (url) => {
     const parsed = new URL(url);
     calls.push(parsed);
+    // Stream probes: `streams` maps a stream URL to its content type.
+    if (!parsed.hostname.endsWith('radio-browser.info')) {
+      const type = streams[url];
+      return type
+        ? new Response('ID3', { status: 200, headers: { 'Content-Type': type } })
+        : new Response('not found', { status: 404 });
+    }
     if (failServers.includes(parsed.hostname)) {
       throw new Error('connect ECONNREFUSED');
     }
@@ -195,7 +206,7 @@ export function fakeUpnpRenderer({ host = '192.168.1.30', description = SONOS_DE
  * A fake Cast device: `connect` returns the client side of an in-memory
  * socket; the device side answers the receiver and media requests.
  */
-export function fakeCastDevice() {
+export function fakeCastDevice({ unsupported = () => false, failOn = 'status' } = {}) {
   const state = {
     app: null,
     media: null,
@@ -247,6 +258,19 @@ export function fakeCastDevice() {
         } else if (namespace === NAMESPACES.MEDIA) {
           if (data.type === 'LOAD') {
             state.media = { mediaSessionId: 7, playerState: 'PLAYING', media: data.media };
+            // A stream the receiver cannot decode: refused in the LOAD answer
+            // ('load'), or accepted then dropped a moment later ('status').
+            state.loads = [...(state.loads ?? []), data.media.contentId];
+            if (unsupported(data.media)) {
+              state.media.failing = true;
+              if (failOn === 'load') {
+                state.media.playerState = 'IDLE';
+                state.media.idleReason = 'ERROR';
+              }
+            }
+          } else if (data.type === 'GET_STATUS' && state.media?.failing) {
+            state.media.playerState = 'IDLE';
+            state.media.idleReason = 'ERROR';
           } else if (data.type === 'PAUSE' && state.media) {
             state.media.playerState = 'PAUSED';
           } else if (data.type === 'PLAY' && state.media) {

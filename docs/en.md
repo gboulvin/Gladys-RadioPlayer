@@ -65,6 +65,11 @@ can be added by hand, see below.
 3. Optionally:
    - **Start volume** — the volume set when a station starts (0 keeps the
      volume of the speaker);
+   - **Prefer MP3 streams** (on by default) — plays the MP3 version of a
+     station when one exists: Android TV refuses raw AAC streams
+     ("incompatible file format"), old DLNA renderers refuse AAC or Ogg. The
+     original stream stays the fallback; if a speaker drops a stream, the
+     next one is tried automatically;
    - **Hide HLS streams** — many DLNA speakers cannot play HLS (`.m3u8`)
      streams: leave it on, unless all your speakers are Google Cast;
    - **Google Cast speakers** / **Sonos and UPnP/DLNA speakers** — turn off a
@@ -161,6 +166,10 @@ _Stop the radio_.
 ## Limits
 
 - **Sonos**: play on the coordinator of a group (the speaker that leads it).
+- **Formats**: a station only published in AAC or Ogg, with no MP3
+  version, may not play on an Android TV or an old DLNA renderer: the logs
+  say which stream was refused. Pick another station, or another entry of
+  the same radio in the catalog.
 - **Old DLNA renderers** may refuse `https` streams or AAC: pick another
   station, or another stream of the same radio.
 - **HLS** streams (`.m3u8`) only play on Google Cast; they are hidden while

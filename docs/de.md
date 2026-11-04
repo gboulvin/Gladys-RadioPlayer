@@ -65,6 +65,11 @@ Multicast), kann manuell hinzugefügt werden, siehe unten.
 3. Optional:
    - **Startlautstärke** — beim Start eines Senders gesetzte Lautstärke (0
      behält die des Lautsprechers);
+   - **MP3-Streams bevorzugen** (standardmäßig an) — spielt die MP3-Version
+     eines Senders, wenn es sie gibt: Android TV lehnt reine AAC-Streams ab
+     („Inkompatibles Dateiformat“), ältere DLNA-Renderer AAC oder Ogg. Der
+     Original-Stream bleibt der Ersatz; bricht ein Lautsprecher einen Stream
+     ab, wird automatisch der nächste versucht;
    - **HLS-Streams ausblenden** — viele DLNA-Lautsprecher spielen keine
      HLS-Streams (`.m3u8`): aktiviert lassen, außer alle Lautsprecher sind
      Google Cast;
@@ -167,6 +172,10 @@ _Radio stoppen_.
 ## Grenzen
 
 - **Sonos**: auf dem Koordinator einer Gruppe abspielen.
+- **Formate**: Ein Sender, der nur in AAC oder Ogg ohne MP3-Version
+  sendet, spielt eventuell nicht auf Android TV oder älteren DLNA-Renderern:
+  Die Logs nennen den abgelehnten Stream. Wählen Sie einen anderen Sender
+  oder einen anderen Eintrag desselben Radios im Katalog.
 - **Ältere DLNA-Renderer** lehnen eventuell `https`-Streams oder AAC ab:
   einen anderen Sender oder Stream wählen.
 - **HLS**-Streams (`.m3u8`) spielen nur auf Google Cast; sie sind

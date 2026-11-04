@@ -331,6 +331,24 @@
       "default": true
     },
     {
+      "key": "prefer_mp3",
+      "type": "boolean",
+      "label": {
+        "en": "Prefer MP3 streams",
+        "fr": "Préférer les flux MP3",
+        "de": "MP3-Streams bevorzugen",
+        "es": "Preferir flujos MP3"
+      },
+      "description": {
+        "en": "Plays the MP3 version of a station when one exists: some speakers (Android TV, older DLNA renderers) cannot play AAC or Ogg streams. The original stream stays the fallback.",
+        "fr": "Lit la version MP3 d'une station quand elle existe : certaines enceintes (Android TV, anciens lecteurs DLNA) ne lisent pas les flux AAC ou Ogg. Le flux d'origine reste le secours.",
+        "de": "Spielt die MP3-Version eines Senders, wenn es sie gibt: Manche Lautsprecher (Android TV, ältere DLNA-Renderer) spielen keine AAC- oder Ogg-Streams. Der Original-Stream bleibt der Ersatz.",
+        "es": "Reproduce la versión MP3 de una emisora si existe: algunos altavoces (Android TV, reproductores DLNA antiguos) no reproducen flujos AAC u Ogg. El flujo original queda como reserva."
+      },
+      "required": false,
+      "default": true
+    },
+    {
       "key": "discovery",
       "type": "section",
       "label": {

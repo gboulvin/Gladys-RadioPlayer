@@ -68,6 +68,11 @@ le multicast) peut être ajoutée à la main, voir plus bas.
 3. Si besoin :
    - **Volume au démarrage** — le volume réglé au lancement d'une station
      (0 garde le volume de l'enceinte) ;
+   - **Préférer les flux MP3** (activé par défaut) — lit la version MP3
+     d'une station quand elle existe : Android TV refuse les flux AAC bruts
+     (« Format de fichier incompatible »), les anciens lecteurs DLNA refusent
+     l'AAC ou l'Ogg. Le flux d'origine reste le secours ; si une enceinte
+     abandonne un flux, le suivant est essayé automatiquement ;
    - **Masquer les flux HLS** — beaucoup d'enceintes DLNA ne lisent pas les
      flux HLS (`.m3u8`) : laissez activé, sauf si toutes vos enceintes sont
      Google Cast ;
@@ -170,6 +175,10 @@ radio_ « France Inter » sur l'enceinte de la chambre à 20 % → _Attendre
 
 - **Sonos** : lancez la radio sur le coordinateur d'un groupe (l'enceinte
   qui le pilote).
+- **Formats** : une station publiée uniquement en AAC ou Ogg, sans version
+  MP3, peut ne pas jouer sur une Android TV ou un ancien lecteur DLNA : les
+  logs indiquent quel flux a été refusé. Choisissez une autre station, ou
+  une autre fiche de la même radio dans le catalogue.
 - Les **vieux lecteurs DLNA** peuvent refuser les flux `https` ou l'AAC :
   choisissez une autre station, ou un autre flux de la même radio.
 - Les flux **HLS** (`.m3u8`) ne sont lus que par Google Cast ; ils sont

@@ -65,6 +65,11 @@ multicast) puede añadirse a mano, ver más abajo.
 3. Opcionalmente:
    - **Volumen inicial** — el volumen al iniciar una emisora (0 mantiene el
      del altavoz);
+   - **Preferir flujos MP3** (activado por defecto) — reproduce la versión
+     MP3 de una emisora si existe: Android TV rechaza los flujos AAC en bruto
+     («Formato de archivo incompatible») y los reproductores DLNA antiguos el
+     AAC u Ogg. El flujo original queda como reserva; si un altavoz abandona
+     un flujo, se prueba el siguiente automáticamente;
    - **Ocultar flujos HLS** — muchos altavoces DLNA no reproducen flujos HLS
      (`.m3u8`): déjelo activado salvo que todos sus altavoces sean Google
      Cast;
@@ -164,6 +169,10 @@ _Reproducir una emisora_ «Cadena SER» en el dormitorio al 20 % → _Esperar
 ## Límites
 
 - **Sonos**: reproduzca en el coordinador de un grupo.
+- **Formatos**: una emisora publicada solo en AAC u Ogg, sin versión MP3,
+  puede no sonar en una Android TV o un reproductor DLNA antiguo: los logs
+  indican qué flujo se rechazó. Elija otra emisora u otra ficha de la misma
+  radio en el catálogo.
 - Los **reproductores DLNA antiguos** pueden rechazar flujos `https` o AAC:
   elija otra emisora u otro flujo de la misma radio.
 - Los flujos **HLS** (`.m3u8`) solo suenan en Google Cast; están ocultos

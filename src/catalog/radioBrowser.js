@@ -21,6 +21,8 @@ const FALLBACK_SERVERS = ['de1.api.radio-browser.info', 'de2.api.radio-browser.i
 const REQUEST_TIMEOUT_MS = 8000;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const CACHE_MAX_ENTRIES = 200;
+// A stream probe only reads the response headers.
+const PROBE_TIMEOUT_MS = 3000;
 
 // Genre folders of the music browser. The value is the Radio Browser tag.
 export const GENRES = [
@@ -75,6 +77,48 @@ export function toStation(raw) {
     bitrate: Number(raw.bitrate) || 0,
     hls: Number(raw.hls) === 1 || /\.m3u8(\?|$)/i.test(String(raw.url_resolved ?? '')),
   };
+}
+
+/** Whether a stream is plain MP3: the one format every network speaker plays. */
+export function isMp3(station) {
+  return !station.hls && (station.codec === 'MP3' || /\.mp3(\?|$)/i.test(station.url));
+}
+
+/**
+ * Guess the MP3 twin of an AAC / Ogg stream URL: broadcasters often publish
+ * the same programme under parallel mounts (`/aac-128/` and `/mp3-128/`,
+ * `live.aac` and `live.mp3`...). Only the codec token of the path changes, so
+ * the guess stays on the host of the original stream.
+ * @returns {string[]} candidate URLs, never the original one
+ */
+export function mp3UrlGuesses(url) {
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return [];
+  }
+  const path = parsed.pathname;
+  const guesses = new Set();
+  // A codec token delimited by / - _ . or the end: aac, aacp, aac+, ogg, opus.
+  const token = /(^|[/._-])(aacp|aac\+|aac|ogg|opus)(?=$|[/._-]|\d)/gi;
+  if (token.test(path)) {
+    guesses.add(path.replace(token, '$1mp3'));
+  }
+  for (const guess of [...guesses]) {
+    // Bitrates below 64 kbps rarely exist in MP3: `aac-48` -> `mp3-128` too.
+    guesses.add(
+      guess.replace(/mp3([-_])(\d{2})(?=\D|$)/i, (m, sep, rate) =>
+        Number(rate) < 96 ? `mp3${sep}128` : m,
+      ),
+    );
+  }
+  guesses.delete(path);
+  return [...guesses].map((guessPath) => {
+    const candidate = new URL(parsed);
+    candidate.pathname = guessPath;
+    return candidate.toString();
+  });
 }
 
 /** MIME type of a stream, from its codec (what DLNA renderers and Cast expect). */
@@ -241,6 +285,78 @@ export class RadioBrowserClient {
     const lower = value.toLowerCase();
     // An exact name wins over the most popular partial match.
     return stations.find((station) => station.name.toLowerCase() === lower) ?? stations[0] ?? null;
+  }
+
+  /**
+   * Read the content type of a stream without downloading it: the body is
+   * cancelled as soon as the headers arrive (a radio stream never ends).
+   * @returns {Promise<string|null>} the content type, null when unreachable
+   */
+  async probeContentType(url) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
+    try {
+      const response = await this.fetch(url, {
+        headers: { 'User-Agent': this.userAgent, 'Icy-MetaData': '0' },
+        signal: controller.signal,
+      });
+      const type = response.ok ? (response.headers.get('content-type') ?? '') : null;
+      response.body?.cancel().catch(() => {});
+      return type;
+    } catch {
+      return null;
+    } finally {
+      clearTimeout(timer);
+      controller.abort();
+    }
+  }
+
+  /**
+   * MP3 versions of a station that is not MP3, best first: other entries of
+   * the same radio in the directory, then guessed parallel mounts confirmed by
+   * their content type. Cached: a station is probed once per hour at most.
+   * @param {Station} station
+   * @returns {Promise<Station[]>} copies of the station with an MP3 stream URL
+   */
+  async mp3Variants(station) {
+    if (isMp3(station)) {
+      return [];
+    }
+    const key = `mp3:${station.uuid}`;
+    const cached = this.cache.get(key);
+    if (cached && cached.expires > this.now()) {
+      return cached.value;
+    }
+    const urls = [];
+    try {
+      const twins = await this.search({
+        country: station.country,
+        name: station.name,
+        limit: 10,
+        excludeHls: true,
+      });
+      const name = station.name.toLowerCase();
+      for (const twin of twins) {
+        if (twin.name.toLowerCase() === name && isMp3(twin) && !urls.includes(twin.url)) {
+          urls.push(twin.url);
+        }
+      }
+    } catch (err) {
+      logger.debug(`No twin search for ${station.name}: ${err.message}`);
+    }
+    const guesses = mp3UrlGuesses(station.url).filter((url) => !urls.includes(url));
+    const probed = await Promise.all(guesses.map((url) => this.probeContentType(url)));
+    guesses.forEach((url, i) => {
+      if (/audio\/(mpeg|mp3)/i.test(probed[i] ?? '') && !urls.includes(url)) {
+        urls.push(url);
+      }
+    });
+    const variants = urls.map((url) => ({ ...station, url, codec: 'MP3', hls: false }));
+    this.cache.set(key, { value: variants, expires: this.now() + CACHE_TTL_MS * 6 });
+    if (variants.length > 0) {
+      logger.info(`${station.name}: MP3 stream found (${variants[0].url})`);
+    }
+    return variants;
   }
 
   /** Count a play (Radio Browser ranks the stations with it). Never throws. */

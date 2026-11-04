@@ -19,6 +19,10 @@ export const DEFAULT_CONFIG = {
   // Many network speakers cannot play HLS (.m3u8) streams: hide those
   // stations from the catalog by default.
   exclude_hls: true,
+  // Play the MP3 version of a station when one exists: MP3 is the one format
+  // every speaker decodes (Android TV refuses raw AAC, old DLNA renderers
+  // refuse AAC or Ogg). The original stream stays the fallback.
+  prefer_mp3: true,
   // Discovery of the players on the local network.
   enable_upnp: true,
   enable_cast: true,
@@ -50,6 +54,7 @@ export function normalizeConfig(raw = {}) {
     country: COUNTRY_CODES.includes(country) ? country : DEFAULT_COUNTRY,
     start_volume: Number.isFinite(startVolume) ? clamp(Math.round(startVolume), 0, 100) : 0,
     exclude_hls: toBoolean(raw.exclude_hls, DEFAULT_CONFIG.exclude_hls),
+    prefer_mp3: toBoolean(raw.prefer_mp3, DEFAULT_CONFIG.prefer_mp3),
     enable_upnp: toBoolean(raw.enable_upnp, DEFAULT_CONFIG.enable_upnp),
     enable_cast: toBoolean(raw.enable_cast, DEFAULT_CONFIG.enable_cast),
     manual_players: String(raw.manual_players ?? ''),
