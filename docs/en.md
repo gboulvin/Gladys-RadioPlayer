@@ -36,6 +36,17 @@ installed anywhere, but the Gladys catalog lists it in these countries.
 The Configuration screen, the documentation and the messages are available
 in **English, French, German and Spanish**.
 
+## Getting started in 3 steps
+
+1. **Configuration** tab: pick the **catalog country** and save.
+2. **Discovery** tab of the integration: your speakers are listed there —
+   add the ones you want. The list is empty? Go back to the Configuration
+   tab and press **Search for speakers**: it scans the network again and
+   tells what each channel (Google Cast, Sonos/DLNA) answered.
+3. **Listen**: press **Play a station now** in the Configuration tab (pick a
+   speaker, type a station name), or use the **Music** box of the dashboard,
+   the RadioPlayer widgets or the scenes.
+
 ## Supported speakers
 
 | Family      | Examples                                                                                                                     | Found by |
@@ -63,6 +74,25 @@ can be added by hand, see below.
      `http://192.168.1.30:1400/xml/device_description.xml` for a Sonos),
      separated by commas.
 4. Save, open the **Discovery** tab and add your speakers.
+
+## Configuration screen buttons
+
+- **Search for speakers** — scans the network now and reports what it found.
+- **Play a station now** — plays a station on one of your speakers.
+- **Test the radio catalog** — the number of stations and the five most
+  listened ones of your country.
+- **Test a speaker** — checks that a speaker answers, and its volume.
+- **Add / Remove / List the favorites**.
+
+## Gladys' native speaker integrations
+
+Gladys also ships native Sonos, Google Cast and AirPlay integrations. They
+only play voice notifications (text-to-speech), and Gladys offers no way for
+another integration to drive their devices. RadioPlayer therefore finds and
+drives the speakers itself; a speaker can be both a native Gladys device and
+a RadioPlayer device. The RadioPlayer devices are Gladys **music players**:
+they use the built-in **Music** box of the dashboard (now playing, browse,
+search) and the built-in "play media" scene action.
 
 ## Listening
 
@@ -140,8 +170,11 @@ _Stop the radio_.
 
 ## Troubleshooting
 
-- **No speaker in Discovery**: check that the speaker is on and on the same
-  network as Gladys, then scan again. Otherwise add it by hand.
+- **No speaker in Discovery**: press **Search for speakers** in the
+  Configuration tab and read the report. `0 answer(s)` on a channel means the
+  speakers did not answer the network search: check that they are on and on
+  the same network as Gladys (no guest Wi-Fi, no separate VLAN), or add them
+  by IP in **Speakers added by hand**. An `error` names the cause.
 - **"The radio catalog is unreachable"**: Gladys has no Internet access, or
   Radio Browser is down (the integration tries every Radio Browser server).
 - **A station does not start**: use **Test a speaker**, then try another

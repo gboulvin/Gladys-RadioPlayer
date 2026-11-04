@@ -11,27 +11,123 @@ const logger = createLogger({ name: 'actions' });
 
 const withValue = (message, value) => mapText(message, (t) => t.replaceAll('%s', value));
 
-export function createActions({ gladys, catalog, store, registry, onFavoritesChanged, getConfig }) {
+const kindLabel = (kind) => (kind === 'cast' ? 'Google Cast' : 'UPnP/DLNA');
+
+/** One line per discovery channel: what the scan saw, what it kept. */
+export function describeReport(report) {
+  const channel = (name, entry, lang) => {
+    if (!entry.enabled) {
+      return `${name}: ${{ en: 'off', fr: 'désactivé', de: 'aus', es: 'desactivado' }[lang]}`;
+    }
+    if (entry.error) {
+      return `${name}: ${{ en: 'error', fr: 'erreur', de: 'Fehler', es: 'error' }[lang]} (${entry.error})`;
+    }
+    const answers = { en: 'answer(s)', fr: 'réponse(s)', de: 'Antwort(en)', es: 'respuesta(s)' }[
+      lang
+    ];
+    const kept = {
+      en: 'speaker(s)',
+      fr: 'enceinte(s)',
+      de: 'Lautsprecher',
+      es: 'altavoz/altavoces',
+    }[lang];
+    return `${name}: ${entry.answers} ${answers}, ${entry.players} ${kept}`;
+  };
+  return Object.fromEntries(
+    ['en', 'fr', 'de', 'es'].map((lang) => [
+      lang,
+      [
+        channel('Google Cast (mDNS)', report.mdns, lang),
+        channel('Sonos/DLNA (SSDP)', report.ssdp, lang),
+      ].join(' · '),
+    ]),
+  );
+}
+
+export function createActions({
+  gladys,
+  catalog,
+  store,
+  registry,
+  radio,
+  onFavoritesChanged,
+  getConfig,
+  rescan,
+}) {
   return {
     async test_catalog() {
       const config = getConfig();
       const [count, top] = await Promise.all([
         catalog.countryStationCount(config.country),
-        catalog.topStations(config.country, { limit: 3, excludeHls: config.exclude_hls }),
+        catalog.topStations(config.country, { limit: 5, excludeHls: config.exclude_hls }),
       ]);
-      const names = top.map((s) => s.name).join(', ');
+      const names = top.map((s, i) => `${i + 1}. ${s.name}`).join(' · ');
       return mapText(
         text(
-          'Catalog reachable: %n stations in %c. Most listened: %t.',
-          'Catalogue joignable : %n stations en/au %c. Les plus écoutées : %t.',
-          'Katalog erreichbar: %n Sender in %c. Meistgehört: %t.',
-          'Catálogo accesible: %n emisoras en %c. Las más escuchadas: %t.',
+          'Catalog OK: %n stations in %c. Most listened: %t. Next step: open the Discovery tab and add your speakers, then use "Play a station now".',
+          'Catalogue OK : %n stations pour le pays %c. Les plus écoutées : %t. Étape suivante : ouvrez l’onglet Découverte et ajoutez vos enceintes, puis utilisez « Lancer une radio maintenant ».',
+          'Katalog OK: %n Sender in %c. Meistgehört: %t. Nächster Schritt: Tab „Erkennung“ öffnen und Lautsprecher hinzufügen, dann „Jetzt einen Sender abspielen“.',
+          'Catálogo OK: %n emisoras en %c. Las más escuchadas: %t. Siguiente paso: abra la pestaña Descubrimiento y añada sus altavoces, luego use «Reproducir una emisora ahora».',
         ),
         (t, lang) =>
           t
             .replace('%n', String(count))
             .replace('%c', countryName(config.country, lang))
             .replace('%t', names || '—'),
+      );
+    },
+
+    async scan_players() {
+      const report = await rescan();
+      const details = describeReport(report);
+      if (report.players.length === 0) {
+        return mapText(
+          text(
+            'No speaker found. %d. Check that the speakers are on and on the same network as Gladys (no guest Wi-Fi, no VLAN), or add them by IP in "Speakers added by hand".',
+            'Aucune enceinte trouvée. %d. Vérifiez que les enceintes sont allumées et sur le même réseau que Gladys (pas de Wi-Fi invité, pas de VLAN), ou ajoutez-les par leur IP dans « Enceintes ajoutées à la main ».',
+            'Kein Lautsprecher gefunden. %d. Sind die Lautsprecher eingeschaltet und im selben Netzwerk wie Gladys (kein Gast-WLAN, kein VLAN)? Sonst per IP unter „Manuell hinzugefügte Lautsprecher“ eintragen.',
+            'Ningún altavoz encontrado. %d. Compruebe que están encendidos y en la misma red que Gladys (sin wifi de invitados ni VLAN), o añádalos por IP en «Altavoces añadidos a mano».',
+          ),
+          (t, lang) => t.replace('%d', details[lang]),
+        );
+      }
+      const list = report.players.map((p) => `${p.name} (${kindLabel(p.kind)})`).join(', ');
+      return mapText(
+        text(
+          '%n speaker(s) found: %l. %d. Add them from the Discovery tab.',
+          '%n enceinte(s) trouvée(s) : %l. %d. Ajoutez-les depuis l’onglet Découverte.',
+          '%n Lautsprecher gefunden: %l. %d. Fügen Sie sie im Tab „Erkennung“ hinzu.',
+          '%n altavoz/altavoces encontrado(s): %l. %d. Añádalos desde la pestaña Descubrimiento.',
+        ),
+        (t, lang) =>
+          t
+            .replace('%n', String(report.players.length))
+            .replace('%l', list)
+            .replace('%d', details[lang]),
+      );
+    },
+
+    async play_now({ device, station: query }) {
+      const station = await radio.playQuery(device, query);
+      if (!station) {
+        return withValue(
+          text(
+            'No station matches "%s" in the catalog of this country.',
+            'Aucune station ne correspond à « %s » dans le catalogue de ce pays.',
+            'Kein Sender passt zu „%s“ im Katalog dieses Landes.',
+            'Ninguna emisora coincide con «%s» en el catálogo de este país.',
+          ),
+          String(query),
+        );
+      }
+      return mapText(
+        text(
+          '%s is starting on %p.',
+          '%s démarre sur %p.',
+          '%s startet auf %p.',
+          '%s empieza a sonar en %p.',
+        ),
+        (t) => t.replace('%s', station.name).replace('%p', radio.playerName(device)),
       );
     },
 

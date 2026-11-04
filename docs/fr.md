@@ -36,6 +36,20 @@ partout, mais le catalogue de Gladys la propose dans ces pays.
 L'écran de configuration, la documentation et les messages existent en
 **français, anglais, allemand et espagnol**.
 
+## Démarrer en 3 étapes
+
+1. Onglet **Configuration** : choisissez le **pays du catalogue** et
+   enregistrez.
+2. Onglet **Découverte** de l'intégration : vos enceintes y sont listées,
+   ajoutez celles que vous voulez. La liste est vide ? Revenez dans l'onglet
+   Configuration et utilisez **Rechercher les enceintes** : il relance la
+   recherche et indique ce que chaque canal (Google Cast, Sonos/DLNA) a
+   répondu.
+3. **Écoutez** : utilisez **Lancer une radio maintenant** dans l'onglet
+   Configuration (choisissez une enceinte, tapez un nom de station), ou la
+   boîte **Musique** du tableau de bord, les widgets RadioPlayer ou les
+   scènes.
+
 ## Enceintes compatibles
 
 | Famille     | Exemples                                                                                                                     | Trouvées par |
@@ -64,6 +78,28 @@ le multicast) peut être ajoutée à la main, voir plus bas.
      `http://192.168.1.30:1400/xml/device_description.xml` pour une Sonos),
      séparées par des virgules.
 4. Enregistrez, ouvrez l'onglet **Découverte** et ajoutez vos enceintes.
+
+## Boutons de l'écran de configuration
+
+- **Rechercher les enceintes** — scanne le réseau maintenant et indique ce
+  qu'il a trouvé.
+- **Lancer une radio maintenant** — lance une station sur l'une de vos
+  enceintes.
+- **Tester le catalogue des radios** — le nombre de stations et les cinq
+  plus écoutées de votre pays.
+- **Tester une enceinte** — vérifie qu'une enceinte répond, et son volume.
+- **Ajouter / Retirer / Lister les favoris**.
+
+## Les intégrations d'enceintes natives de Gladys
+
+Gladys fournit aussi des intégrations natives Sonos, Google Cast et AirPlay.
+Elles ne jouent que les notifications vocales (synthèse vocale), et Gladys
+ne permet pas à une autre intégration de piloter leurs appareils.
+RadioPlayer trouve et pilote donc les enceintes lui-même ; une enceinte peut
+être à la fois un appareil natif et un appareil RadioPlayer. Les appareils
+RadioPlayer sont des **lecteurs de musique** Gladys : ils utilisent la boîte
+**Musique** intégrée au tableau de bord (lecture en cours, navigation,
+recherche) et l'action de scène native « lire un média ».
 
 ## Écouter
 
@@ -143,9 +179,12 @@ radio_ « France Inter » sur l'enceinte de la chambre à 20 % → _Attendre
 
 ## Dépannage
 
-- **Aucune enceinte dans Découverte** : vérifiez que l'enceinte est allumée
-  et sur le même réseau que Gladys, puis relancez la recherche. Sinon,
-  ajoutez-la à la main.
+- **Aucune enceinte dans Découverte** : utilisez **Rechercher les
+  enceintes** dans l'onglet Configuration et lisez le rapport. `0 réponse(s)`
+  sur un canal signifie que les enceintes n'ont pas répondu à la recherche
+  réseau : vérifiez qu'elles sont allumées et sur le même réseau que Gladys
+  (pas de Wi-Fi invité, pas de VLAN séparé), ou ajoutez-les par leur IP dans
+  **Enceintes ajoutées à la main**. Une `erreur` en donne la cause.
 - **« Le catalogue des radios est injoignable »** : Gladys n'a pas accès à
   Internet, ou Radio Browser est en panne (l'intégration essaie tous les
   serveurs Radio Browser).

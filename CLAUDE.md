@@ -70,7 +70,14 @@ test/                            node --test, against the SDK's fake Gladys, fak
 - **Discovery is mediated.** Multicast never reaches the container: SSDP and
   mDNS go through `gladys.scanNetwork`, and every capture must be declared in
   the manifest `network_discovery` (test/manifest.test.js checks it). Only
-  follow an SSDP `LOCATION` on the host that answered.
+  follow an SSDP `LOCATION` on the host that answered. The core runs **one
+  scan at a time** per integration (409 otherwise) and only uses the
+  **first** `ssdp` entry: every scan goes through `PlayerRegistry.discover`,
+  which queues them.
+- **Gladys' native Sonos / Google Cast / AirPlay integrations** cannot be
+  driven by an external integration (no host API for that, and their
+  `play_notification` only plays TTS): RadioPlayer drives the speakers itself
+  and exposes them as `music` players for the core Music box.
 - **Scene triggers fire on observed transitions**, never as the consequence of
   a scene action of this integration (`fromScene` in `src/radio.js`): a scene
   bound to the event would loop.

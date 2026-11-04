@@ -18,10 +18,10 @@ import { escapeXml, tagBlocks, tagText } from './xml.js';
 
 const logger = createLogger({ name: 'upnp' });
 
-export const SSDP_SEARCH_TARGETS = [
-  'urn:schemas-upnp-org:device:MediaRenderer:1',
-  'urn:schemas-upnp-org:device:ZonePlayer:1',
-];
+// The Gladys core sends ONE M-SEARCH, for the first `ssdp` entry of the
+// manifest: MediaRenderer:1 is answered by every DLNA renderer and by Sonos
+// players (their embedded MediaRenderer device).
+export const SSDP_SEARCH_TARGETS = ['urn:schemas-upnp-org:device:MediaRenderer:1'];
 
 const AV_TRANSPORT = 'urn:schemas-upnp-org:service:AVTransport:1';
 const RENDERING_CONTROL = 'urn:schemas-upnp-org:service:RenderingControl:1';

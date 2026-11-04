@@ -10,6 +10,33 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- **Search for speakers** button in the Configuration screen: scans the
+  network now and reports what Google Cast (mDNS) and Sonos/DLNA (SSDP)
+  answered, so an empty Discovery tab is no longer a dead end.
+- **Play a station now** button: plays a station on a speaker straight from
+  the Configuration screen.
+- The Configuration screen explains the three steps (country, Discovery tab,
+  listen), and its status line says when no speaker was found yet.
+- Documentation: getting started in 3 steps, the Configuration buttons, and
+  how RadioPlayer relates to the native Sonos, Google Cast and AirPlay
+  integrations of Gladys.
+
+### Changed
+
+- **Test the radio catalog** lists the five most listened stations and the
+  next step.
+
+### Fixed
+
+- The Discovery tab could stay empty: the Google Cast and Sonos/DLNA scans
+  ran at the same time, and Gladys only runs one network scan per
+  integration at once. The scans now run one after the other, and a scan
+  refused because another one is running is retried.
+- The manifest declared a second SSDP search target that Gladys never uses
+  (it only sends the first one): removed from the install screen.
+
 ## [1.0.0] - 2026-11-02
 
 ### Added

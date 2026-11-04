@@ -45,7 +45,7 @@ export async function setup({ scanResults, configOverrides = {}, timers = [] } =
     schedule: (fn) => timers.push(fn),
   });
   const logos = new LogoStore({ fetch: async () => new Response('x', { status: 404 }) });
-  const players = await registry.discover(gladys, config);
+  const { players } = await registry.discover(gladys, config);
   const devices = players.map((player) => buildDevice(gladys, player));
   await gladys.publishDiscoveredDevices(devices);
   const sonos = devices.find((d) => d.params.some((p) => p.value === 'upnp'));

@@ -36,6 +36,17 @@ cualquier lugar, pero el catálogo de Gladys la muestra en estos países.
 La configuración, la documentación y los mensajes están en **español,
 inglés, francés y alemán**.
 
+## Empezar en 3 pasos
+
+1. Pestaña **Configuración**: elija el **país del catálogo** y guarde.
+2. Pestaña **Descubrimiento** de la integración: ahí aparecen sus
+   altavoces, añada los que quiera. ¿La lista está vacía? Vuelva a
+   Configuración y pulse **Buscar altavoces**: repite la búsqueda e indica
+   lo que respondió cada canal (Google Cast, Sonos/DLNA).
+3. **Escuche**: pulse **Reproducir una emisora ahora** en Configuración
+   (elija un altavoz, escriba una emisora), o use la caja **Música** del
+   panel, los widgets RadioPlayer o las escenas.
+
 ## Altavoces compatibles
 
 | Familia     | Ejemplos                                                                                                                      | Encontrados por |
@@ -64,6 +75,27 @@ multicast) puede añadirse a mano, ver más abajo.
      `http://192.168.1.30:1400/xml/device_description.xml` para un Sonos),
      separadas por comas.
 4. Guarde, abra la pestaña **Descubrimiento** y añada sus altavoces.
+
+## Botones de la configuración
+
+- **Buscar altavoces** — busca ahora en la red e indica lo encontrado.
+- **Reproducir una emisora ahora** — reproduce una emisora en uno de sus
+  altavoces.
+- **Probar el catálogo de radios** — el número de emisoras y las cinco más
+  escuchadas de su país.
+- **Probar un altavoz** — comprueba que un altavoz responde, y su volumen.
+- **Añadir / Quitar / Ver los favoritos**.
+
+## Las integraciones de altavoces nativas de Gladys
+
+Gladys incluye también integraciones nativas Sonos, Google Cast y AirPlay.
+Solo reproducen avisos de voz (síntesis de voz), y Gladys no permite que
+otra integración controle sus dispositivos. Por eso RadioPlayer encuentra y
+controla los altavoces por sí mismo; un altavoz puede ser a la vez un
+dispositivo nativo y un dispositivo RadioPlayer. Los dispositivos
+RadioPlayer son **reproductores de música** de Gladys: usan la caja
+**Música** integrada en el panel (sonando ahora, explorar, buscar) y la
+acción de escena nativa «reproducir un medio».
 
 ## Escuchar
 
@@ -141,8 +173,12 @@ _Reproducir una emisora_ «Cadena SER» en el dormitorio al 20 % → _Esperar
 
 ## Solución de problemas
 
-- **Ningún altavoz en Descubrimiento**: compruebe que está encendido y en la
-  misma red que Gladys y vuelva a buscar; si no, añádalo a mano.
+- **Ningún altavoz en Descubrimiento**: pulse **Buscar altavoces** en
+  Configuración y lea el informe. `0 respuesta(s)` en un canal significa que
+  los altavoces no respondieron a la búsqueda en red: compruebe que están
+  encendidos y en la misma red que Gladys (sin wifi de invitados ni VLAN
+  separada), o añádalos por IP en **Altavoces añadidos a mano**. Un `error`
+  indica la causa.
 - **«El catálogo de radios no es accesible»**: Gladys no tiene Internet o
   Radio Browser no responde (la integración prueba todos sus servidores).
 - **Una emisora no arranca**: use **Probar un altavoz** y pruebe otra

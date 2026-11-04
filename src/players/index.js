@@ -21,7 +21,9 @@ import { loadUpnpPlayer, parseSsdpHeaders } from './upnp.js';
 
 const logger = createLogger({ name: 'players' });
 
-const SCAN_TIMEOUT_SECONDS = 5;
+// Cast devices and DLNA renderers answer within 1-3 s; 5 s leaves margin
+// while keeping the two sequential scans under 15 s.
+export const SCAN_TIMEOUT_SECONDS = 5;
 
 export const PARAMS = {
   KIND: 'PLAYER_KIND',
@@ -54,6 +56,8 @@ export class PlayerRegistry {
     /** @type {Map<string, import('./upnp.js').UpnpPlayer | CastPlayer>} by device external_id */
     this.players = new Map();
     this.listeners = [];
+    this.scanQueue = Promise.resolve();
+    this.lastReport = null;
   }
 
   /** Called with (deviceExternalId) when a player reports a change by itself. */
@@ -84,18 +88,39 @@ export class PlayerRegistry {
     return new CastPlayer(info, this.castConnect ? { connect: this.castConnect } : {});
   }
 
-  /** Scan the network and the manual entries. Never throws: a failing channel is logged. */
-  async discover(gladys, config) {
+  /**
+   * Scan the network and the manual entries. Never throws: a failing channel
+   * is reported. Scans run ONE AT A TIME: the Gladys core accepts a single
+   * mediated scan per integration (409 otherwise), so the startup scan, the
+   * Discovery tab and a config change must never overlap.
+   * @returns {Promise<{ players: object[], report: object }>}
+   */
+  discover(gladys, config) {
+    const run = this.scanQueue.then(() => this.runDiscovery(gladys, config));
+    // The queue survives a failed run.
+    this.scanQueue = run.catch(() => {});
+    return run;
+  }
+
+  async runDiscovery(gladys, config) {
+    const report = {
+      ssdp: { enabled: config.enable_upnp, answers: 0, players: 0, error: null },
+      mdns: { enabled: config.enable_cast, answers: 0, players: 0, error: null },
+      manual: { entries: parseManualPlayers(config.manual_players).length, players: 0 },
+      players: [],
+    };
     const found = [];
-    const tasks = [];
+    // Sequential on purpose, see discover().
     if (config.enable_upnp) {
-      tasks.push(this.discoverUpnp(gladys).then((players) => found.push(...players)));
+      found.push(...(await this.discoverUpnp(gladys, report.ssdp)));
     }
     if (config.enable_cast) {
-      tasks.push(this.discoverCast(gladys).then((players) => found.push(...players)));
+      found.push(...(await this.discoverCast(gladys, report.mdns)));
     }
-    tasks.push(this.loadManual(config).then((players) => found.push(...players)));
-    await Promise.all(tasks);
+    const manual = await this.loadManual(config);
+    report.manual.players = manual.length;
+    found.push(...manual);
+
     const ids = new Set();
     const unique = [];
     for (const player of found) {
@@ -106,18 +131,42 @@ export class PlayerRegistry {
         this.add(gladys, player);
       }
     }
-    logger.info(`Discovery: ${unique.length} player(s) found`);
-    return unique;
+    report.players = unique.map((player) => ({ name: player.name, kind: player.kind }));
+    logger.info(
+      `Discovery: ${unique.length} player(s) found ` +
+        `(SSDP ${report.ssdp.answers} answer(s), mDNS ${report.mdns.answers} answer(s), ` +
+        `manual ${report.manual.players})`,
+    );
+    this.lastReport = report;
+    return { players: unique, report };
   }
 
-  async discoverUpnp(gladys) {
+  /** scanNetwork, retried once when another scan of this integration is still running. */
+  async scan(gladys, type) {
+    try {
+      return await gladys.scanNetwork(type, { timeoutSeconds: SCAN_TIMEOUT_SECONDS });
+    } catch (err) {
+      if (err.status !== 409 && !/ALREADY_RUNNING/.test(err.message)) {
+        throw err;
+      }
+      logger.debug(`${type} scan busy, retrying`);
+      await new Promise((resolve) => {
+        setTimeout(resolve, (SCAN_TIMEOUT_SECONDS + 1) * 1000).unref?.();
+      });
+      return gladys.scanNetwork(type, { timeoutSeconds: SCAN_TIMEOUT_SECONDS });
+    }
+  }
+
+  async discoverUpnp(gladys, report = {}) {
     let answers;
     try {
-      answers = await gladys.scanNetwork('ssdp', { timeoutSeconds: SCAN_TIMEOUT_SECONDS });
+      answers = await this.scan(gladys, 'ssdp');
     } catch (err) {
       logger.warn(`SSDP scan failed: ${err.message}`);
+      report.error = err.message;
       return [];
     }
+    report.answers = answers.length;
     const locations = new Set();
     for (const answer of answers) {
       const location = parseSsdpHeaders(answer.headers).location;
@@ -138,23 +187,35 @@ export class PlayerRegistry {
     const players = await Promise.all(
       [...locations].map((location) =>
         loadUpnpPlayer(location, { fetch: this.fetch }).catch((err) => {
-          logger.debug(`UPnP description ${location} unreadable: ${err.message}`);
+          logger.warn(`UPnP description ${location} unreadable: ${err.message}`);
           return null;
         }),
       ),
     );
-    return players.filter(Boolean);
+    const kept = players.filter(Boolean);
+    report.players = kept.length;
+    return kept;
   }
 
-  async discoverCast(gladys) {
+  async discoverCast(gladys, report = {}) {
     try {
-      const services = await gladys.scanNetwork('mdns', { timeoutSeconds: SCAN_TIMEOUT_SECONDS });
-      return services
+      const services = await this.scan(gladys, 'mdns');
+      report.answers = services.length;
+      const players = services
         .map((service) => parseCastService({ ...service, record: parseMdnsTxt(service.txt ?? []) }))
         .filter(Boolean)
         .map((info) => this.createCast(info));
+      if (players.length < services.length) {
+        logger.warn(
+          `${services.length - players.length} Google Cast answer(s) without an IPv4 address: ` +
+            'add these speakers by IP in the configuration',
+        );
+      }
+      report.players = players.length;
+      return players;
     } catch (err) {
       logger.warn(`mDNS scan failed: ${err.message}`);
+      report.error = err.message;
       return [];
     }
   }

@@ -44,6 +44,19 @@ const radio = new RadioService({ gladys, catalog, store, registry, config });
 // Loaded once: on a reconnection, the in-memory state is the freshest.
 let storeLoaded = null;
 
+const CATALOG_UNREACHABLE = text(
+  'The radio catalog is unreachable: check the Internet connection of Gladys.',
+  'Le catalogue des radios est injoignable : vérifiez la connexion Internet de Gladys.',
+  'Der Radiokatalog ist nicht erreichbar: Prüfen Sie die Internetverbindung von Gladys.',
+  'El catálogo de radios no es accesible: compruebe la conexión a Internet de Gladys.',
+);
+const NO_SPEAKER_FOUND = text(
+  'No speaker found on the network yet: press "Search for speakers" below for a diagnosis, or add one by IP.',
+  'Aucune enceinte trouvée sur le réseau : utilisez « Rechercher les enceintes » ci-dessous pour un diagnostic, ou ajoutez-en une par son IP.',
+  'Noch kein Lautsprecher im Netzwerk gefunden: „Lautsprecher suchen“ unten zeigt eine Diagnose, oder fügen Sie einen per IP hinzu.',
+  'Aún no se ha encontrado ningún altavoz: pulse «Buscar altavoces» abajo para un diagnóstico, o añada uno por IP.',
+);
+
 // Players found by the last scan, kept to re-publish them without scanning
 // again (config or favorites change).
 let discovered = [];
@@ -63,12 +76,31 @@ async function stationOptions() {
 
 async function publishDevices({ scan }) {
   if (scan) {
-    discovered = await registry.discover(gladys, config);
+    ({ players: discovered } = await registry.discover(gladys, config));
   }
   const stations = await stationOptions();
   await gladys.publishDiscoveredDevices(
     discovered.map((player) => buildDevice(gladys, player, { stations })),
   );
+  if (scan) {
+    await reportStatus();
+  }
+}
+
+// The status line of the Configuration screen says what to do next: an
+// empty Discovery tab must never be a silent dead end.
+let catalogReachable = true;
+async function reportStatus() {
+  if (!catalogReachable) {
+    await gladys.setConnectionStatus(false, CATALOG_UNREACHABLE);
+    return;
+  }
+  const created = (gladys.devices ?? []).length;
+  if (discovered.length === 0 && created === 0) {
+    await gladys.setConnectionStatus(true, NO_SPEAKER_FOUND);
+  } else {
+    await gladys.setConnectionStatus(true);
+  }
 }
 
 async function onFavoritesChanged() {
@@ -125,7 +157,20 @@ gladys.onMusicSearch(music.search);
 gladys.onMusicPlay(music.play);
 
 // --- Configuration screen actions --------------------------------------------------
-const actions = createActions({ gladys, catalog, store, registry, onFavoritesChanged, getConfig });
+const actions = createActions({
+  gladys,
+  catalog,
+  store,
+  registry,
+  radio,
+  onFavoritesChanged,
+  getConfig,
+  // The "Search for speakers" button runs the same scan as the Discovery tab.
+  rescan: async () => {
+    await publishDevices({ scan: true });
+    return registry.lastReport;
+  },
+});
 for (const [key, handler] of Object.entries(actions)) {
   gladys.onAction(key, (fields) => handler(fields ?? {}));
 }
@@ -165,23 +210,28 @@ gladys.on('connected', async () => {
     radio.config = config;
     storeLoaded = storeLoaded ?? store.load();
     await storeLoaded;
+    catalogReachable = await catalog
+      .topStations(config.country, { limit: 1, excludeHls: config.exclude_hls })
+      .then(() => true)
+      .catch((err) => {
+        logger.error(`Radio catalog unreachable: ${err.message}`);
+        return false;
+      });
     await publishDevices({ scan: true });
     // Read the real state of the created players once, so the dashboard is
     // right before the first poll.
     await Promise.all((gladys.devices ?? []).map((device) => radio.refresh(device.external_id)));
     refreshAllWidgets(gladys);
-    await catalog.topStations(config.country, { limit: 1, excludeHls: config.exclude_hls });
-    await gladys.setConnectionStatus(true);
   } catch (err) {
     logger.error('Post-connection initialization failed', err);
     await gladys
       .setConnectionStatus(
         false,
         text(
-          'The radio catalog is unreachable: check the Internet connection of Gladys.',
-          'Le catalogue des radios est injoignable : vérifiez la connexion Internet de Gladys.',
-          'Der Radiokatalog ist nicht erreichbar: Prüfen Sie die Internetverbindung von Gladys.',
-          'El catálogo de radios no es accesible: compruebe la conexión a Internet de Gladys.',
+          'Initialization failed, check the integration logs.',
+          "L'initialisation a échoué, consultez les logs de l'intégration.",
+          'Die Initialisierung ist fehlgeschlagen, prüfen Sie die Logs der Integration.',
+          'La inicialización ha fallado, consulte los logs de la integración.',
         ),
       )
       .catch(() => {});

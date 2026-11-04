@@ -56,10 +56,6 @@
     {
       "type": "ssdp",
       "st": "urn:schemas-upnp-org:device:MediaRenderer:1"
-    },
-    {
-      "type": "ssdp",
-      "st": "urn:schemas-upnp-org:device:ZonePlayer:1"
     }
   ],
   "config_schema": [
@@ -67,16 +63,16 @@
       "key": "intro",
       "type": "section",
       "label": {
-        "en": "Getting started",
-        "fr": "Pour commencer",
-        "de": "Erste Schritte",
-        "es": "Primeros pasos"
+        "en": "How to start",
+        "fr": "Comment démarrer",
+        "de": "So starten Sie",
+        "es": "Cómo empezar"
       },
       "description": {
-        "en": "Pick your country: its radio catalog (from the free Radio Browser directory) feeds the music panel, the widgets and the scenes. Then open the Discovery tab to add your speakers. Internet access is needed for the catalog and the streams.",
-        "fr": "Choisissez votre pays : son catalogue de radios (annuaire gratuit Radio Browser) alimente le panneau musique, les widgets et les scènes. Ouvrez ensuite l’onglet Découverte pour ajouter vos enceintes. Un accès Internet est nécessaire pour le catalogue et les flux.",
-        "de": "Wählen Sie Ihr Land: Sein Radiokatalog (aus dem freien Verzeichnis Radio Browser) speist das Musik-Panel, die Widgets und die Szenen. Fügen Sie dann im Tab „Erkennung“ Ihre Lautsprecher hinzu. Für Katalog und Streams ist Internetzugang nötig.",
-        "es": "Elija su país: su catálogo de radios (del directorio gratuito Radio Browser) alimenta el panel de música, los widgets y las escenas. Después abra la pestaña Descubrimiento para añadir sus altavoces. Se necesita acceso a Internet para el catálogo y los flujos."
+        "en": "1. Pick the catalog country below and save. 2. Open the Discovery tab of this integration and add your speakers (Google Cast, Sonos, DLNA); nothing there? Press \"Search for speakers\" at the bottom of this page. 3. Listen: \"Play a station now\" below, the music box or the RadioPlayer widgets of the dashboard, or the scenes. Internet access is needed for the catalog and the streams.",
+        "fr": "1. Choisissez le pays du catalogue ci-dessous et enregistrez. 2. Ouvrez l'onglet Découverte de cette intégration et ajoutez vos enceintes (Google Cast, Sonos, DLNA) ; rien n'apparaît ? Utilisez « Rechercher les enceintes » en bas de cette page. 3. Écoutez : « Lancer une radio maintenant » ci-dessous, la boîte Musique ou les widgets RadioPlayer du tableau de bord, ou les scènes. Un accès Internet est nécessaire pour le catalogue et les flux.",
+        "de": "1. Wählen Sie unten das Katalogland und speichern Sie. 2. Öffnen Sie den Tab „Erkennung“ dieser Integration und fügen Sie Ihre Lautsprecher hinzu (Google Cast, Sonos, DLNA); nichts zu sehen? Nutzen Sie „Lautsprecher suchen“ unten auf dieser Seite. 3. Hören: „Jetzt einen Sender abspielen“ unten, die Musik-Box oder die RadioPlayer-Widgets im Dashboard, oder Szenen. Für Katalog und Streams ist Internetzugang nötig.",
+        "es": "1. Elija abajo el país del catálogo y guarde. 2. Abra la pestaña Descubrimiento de esta integración y añada sus altavoces (Google Cast, Sonos, DLNA); ¿no aparece nada? Pulse «Buscar altavoces» al final de esta página. 3. Escuche: «Reproducir una emisora ahora» abajo, la caja Música o los widgets RadioPlayer del panel, o las escenas. Se necesita acceso a Internet para el catálogo y los flujos."
       },
       "links": [
         {
@@ -412,6 +408,75 @@
     }
   ],
   "actions": [
+    {
+      "key": "scan_players",
+      "label": {
+        "en": "Search for speakers",
+        "fr": "Rechercher les enceintes",
+        "de": "Lautsprecher suchen",
+        "es": "Buscar altavoces"
+      },
+      "description": {
+        "en": "Scans the network now and tells what it found: the speakers then appear in the Discovery tab.",
+        "fr": "Scanne le réseau maintenant et indique ce qu'il a trouvé : les enceintes apparaissent ensuite dans l'onglet Découverte.",
+        "de": "Durchsucht jetzt das Netzwerk und zeigt das Ergebnis: Die Lautsprecher erscheinen dann im Tab „Erkennung“.",
+        "es": "Busca ahora en la red e indica lo encontrado: los altavoces aparecen luego en la pestaña Descubrimiento."
+      },
+      "timeout_seconds": 45
+    },
+    {
+      "key": "play_now",
+      "label": {
+        "en": "Play a station now",
+        "fr": "Lancer une radio maintenant",
+        "de": "Jetzt einen Sender abspielen",
+        "es": "Reproducir una emisora ahora"
+      },
+      "description": {
+        "en": "Plays a station of the catalog on one of your speakers (added from the Discovery tab).",
+        "fr": "Lance une station du catalogue sur l'une de vos enceintes (ajoutées depuis l'onglet Découverte).",
+        "de": "Spielt einen Sender aus dem Katalog auf einem Ihrer Lautsprecher (im Tab „Erkennung“ hinzugefügt).",
+        "es": "Reproduce una emisora del catálogo en uno de sus altavoces (añadidos desde la pestaña Descubrimiento)."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Player",
+            "fr": "Lecteur",
+            "de": "Player",
+            "es": "Reproductor"
+          },
+          "required": true
+        },
+        {
+          "key": "station",
+          "type": "string",
+          "label": {
+            "en": "Station",
+            "fr": "Station",
+            "de": "Sender",
+            "es": "Emisora"
+          },
+          "description": {
+            "en": "Name of the station (or its Radio Browser identifier), searched in the catalog of the configured country.",
+            "fr": "Nom de la station (ou son identifiant Radio Browser), cherché dans le catalogue du pays configuré.",
+            "de": "Name des Senders (oder seine Radio-Browser-ID), gesucht im Katalog des eingestellten Landes.",
+            "es": "Nombre de la emisora (o su identificador de Radio Browser), buscado en el catálogo del país configurado."
+          },
+          "placeholder": {
+            "en": "e.g. France Inter",
+            "fr": "ex. France Inter",
+            "de": "z. B. Deutschlandfunk",
+            "es": "p. ej. Cadena SER"
+          },
+          "required": true
+        }
+      ]
+    },
     {
       "key": "test_catalog",
       "label": {

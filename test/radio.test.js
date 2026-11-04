@@ -7,7 +7,7 @@ import { PlayerRegistry } from '../src/players/index.js';
 import { SCENE_TRIGGERS } from '../src/radio.js';
 import { createSceneActions } from '../src/scenes.js';
 import { fakeUpnpRenderer } from './helpers.js';
-import { setup } from './setup.js';
+import { MDNS_ANSWER, SSDP_ANSWER, setup } from './setup.js';
 
 test('discovery finds the Sonos (SSDP) and the Cast speaker (mDNS), Gladys accepts them', async () => {
   const ctx = await setup();
@@ -38,7 +38,7 @@ test('an SSDP answer pointing to another host is not followed', async () => {
   });
   const renderer = fakeUpnpRenderer();
   const registry = new PlayerRegistry({ fetch: renderer.fetch });
-  const players = await registry.discover(gladys, {
+  const { players } = await registry.discover(gladys, {
     enable_upnp: true,
     enable_cast: false,
     manual_players: '',
@@ -275,4 +275,69 @@ test('the station select lists the given stations', () => {
     { value: 'a', label: 'A', sort_order: 0 },
     { value: 'b', label: 'B', sort_order: 1 },
   ]);
+});
+
+test('scans run one at a time, and a busy scan is retried', async (t) => {
+  // The Gladys core runs ONE mediated scan per integration: a second one
+  // while the first runs is a 409 EXTERNAL_INTEGRATION_SCAN_ALREADY_RUNNING.
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const renderer = fakeUpnpRenderer();
+  let running = 0;
+  let busyOnce = true;
+  const calls = [];
+  const gladys = createFakeGladys();
+  gladys.scanNetwork = async (type) => {
+    calls.push(type);
+    if (running > 0) {
+      throw Object.assign(new Error('EXTERNAL_INTEGRATION_SCAN_ALREADY_RUNNING'), { status: 409 });
+    }
+    if (type === 'mdns' && busyOnce) {
+      busyOnce = false;
+      throw Object.assign(new Error('EXTERNAL_INTEGRATION_SCAN_ALREADY_RUNNING'), { status: 409 });
+    }
+    running += 1;
+    await Promise.resolve();
+    running -= 1;
+    return type === 'ssdp' ? [SSDP_ANSWER] : [MDNS_ANSWER];
+  };
+  const registry = new PlayerRegistry({ fetch: renderer.fetch, castConnect: async () => null });
+  const config = { enable_upnp: true, enable_cast: true, manual_players: '' };
+  const first = registry.discover(gladys, config);
+  const second = registry.discover(gladys, config);
+  // Let the first run reach the retry delay of its busy mDNS scan.
+  for (let i = 0; i < 20; i += 1) {
+    await Promise.resolve();
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  t.mock.timers.tick(10_000);
+  const { players, report } = await first;
+  await second;
+  assert.equal(players.length, 2);
+  assert.deepEqual(calls, ['ssdp', 'mdns', 'mdns', 'ssdp', 'mdns']);
+  assert.equal(report.ssdp.answers, 1);
+  assert.equal(report.mdns.players, 1);
+  assert.equal(report.mdns.error, null);
+  registry.closeAll();
+});
+
+test('a failing channel is reported, the other one still works', async () => {
+  const renderer = fakeUpnpRenderer();
+  const gladys = createFakeGladys();
+  gladys.scanNetwork = async (type) => {
+    if (type === 'mdns') {
+      throw Object.assign(new Error('network_discovery: capture type mdns is not declared'), {
+        status: 403,
+      });
+    }
+    return [SSDP_ANSWER];
+  };
+  const registry = new PlayerRegistry({ fetch: renderer.fetch });
+  const { players, report } = await registry.discover(gladys, {
+    enable_upnp: true,
+    enable_cast: true,
+    manual_players: '',
+  });
+  assert.equal(players.length, 1);
+  assert.match(report.mdns.error, /not declared/);
+  assert.deepEqual(report.players, [{ name: 'Salon & Cuisine', kind: 'upnp' }]);
 });

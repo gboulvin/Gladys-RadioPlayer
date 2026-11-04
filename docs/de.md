@@ -36,6 +36,17 @@ installieren, der Gladys-Katalog zeigt sie in diesen Ländern an.
 Konfiguration, Dokumentation und Meldungen gibt es auf **Deutsch, Englisch,
 Französisch und Spanisch**.
 
+## In 3 Schritten starten
+
+1. Tab **Konfiguration**: **Katalogland** wählen und speichern.
+2. Tab **Erkennung** der Integration: Ihre Lautsprecher stehen dort — fügen
+   Sie die gewünschten hinzu. Die Liste ist leer? Zurück zur Konfiguration
+   und **Lautsprecher suchen** drücken: Die Suche läuft erneut und zeigt, was
+   jeder Kanal (Google Cast, Sonos/DLNA) geantwortet hat.
+3. **Hören**: **Jetzt einen Sender abspielen** in der Konfiguration
+   (Lautsprecher wählen, Sendernamen eingeben), oder die **Musik**-Box des
+   Dashboards, die RadioPlayer-Widgets oder Szenen.
+
 ## Unterstützte Lautsprecher
 
 | Familie     | Beispiele                                                                                                                       | Gefunden über |
@@ -65,6 +76,29 @@ Multicast), kann manuell hinzugefügt werden, siehe unten.
      `http://192.168.1.30:1400/xml/device_description.xml` für Sonos), mit
      Kommas getrennt.
 4. Speichern, Tab **Erkennung** öffnen und die Lautsprecher hinzufügen.
+
+## Buttons der Konfiguration
+
+- **Lautsprecher suchen** — durchsucht jetzt das Netzwerk und zeigt das
+  Ergebnis.
+- **Jetzt einen Sender abspielen** — spielt einen Sender auf einem Ihrer
+  Lautsprecher.
+- **Radiokatalog testen** — Anzahl der Sender und die fünf meistgehörten
+  Ihres Landes.
+- **Lautsprecher testen** — prüft, ob ein Lautsprecher antwortet, und seine
+  Lautstärke.
+- **Favorit hinzufügen / entfernen / anzeigen**.
+
+## Die eingebauten Lautsprecher-Integrationen von Gladys
+
+Gladys bringt auch eigene Sonos-, Google-Cast- und AirPlay-Integrationen
+mit. Sie spielen nur Sprachansagen (Text-to-Speech), und Gladys erlaubt
+einer anderen Integration nicht, ihre Geräte zu steuern. RadioPlayer findet
+und steuert die Lautsprecher daher selbst; ein Lautsprecher kann zugleich
+ein eingebautes und ein RadioPlayer-Gerät sein. RadioPlayer-Geräte sind
+Gladys-**Musik-Player**: Sie nutzen die eingebaute **Musik**-Box des
+Dashboards (läuft gerade, Durchsuchen, Suche) und die eingebaute
+Szenenaktion „Medien abspielen“.
 
 ## Hören
 
@@ -142,8 +176,12 @@ _Radio stoppen_.
 
 ## Fehlerbehebung
 
-- **Kein Lautsprecher in Erkennung**: Ist er eingeschaltet und im selben
-  Netzwerk wie Gladys? Dann erneut suchen, sonst manuell hinzufügen.
+- **Kein Lautsprecher in Erkennung**: **Lautsprecher suchen** in der
+  Konfiguration drücken und den Bericht lesen. `0 Antwort(en)` auf einem
+  Kanal heißt, dass die Lautsprecher nicht auf die Netzwerksuche geantwortet
+  haben: Sind sie eingeschaltet und im selben Netzwerk wie Gladys (kein
+  Gast-WLAN, kein separates VLAN)? Sonst per IP unter **Manuell hinzugefügte
+  Lautsprecher** eintragen. Ein `Fehler` nennt die Ursache.
 - **„Der Radiokatalog ist nicht erreichbar“**: Gladys hat kein Internet, oder
   Radio Browser ist gestört (die Integration probiert alle Server).
 - **Ein Sender startet nicht**: **Lautsprecher testen** nutzen und einen
