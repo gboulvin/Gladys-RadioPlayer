@@ -55,6 +55,11 @@ inglés, francés y alemán**.
 | Sonos       | Todos los altavoces Sonos (S1 y S2)                                                                                           | SSDP            |
 | UPnP / DLNA | Receptores de red (Denon, Marantz, Yamaha, Onkyo, Pioneer), televisores, Kodi, BubbleUPnP…                                    | SSDP            |
 
+Una Android TV, o un altavoz con Chromecast integrado, suele responder
+también como reproductor DLNA, mucho menos compatible con los flujos: ese
+dispositivo se conserva una sola vez, como Google Cast. Un duplicado creado
+con una versión anterior puede borrarse de la lista de dispositivos.
+
 Un altavoz que la búsqueda no ve (otra subred, un router que filtra el
 multicast) puede añadirse a mano, ver más abajo.
 
@@ -113,15 +118,17 @@ Cada altavoz es un **reproductor de música** de Gladys:
 - la tarjeta del dispositivo ofrece reproducir / pausa / detener, el volumen,
   silencio y **emisora siguiente / anterior**: pasan de un favorito a otro
   (a partir de dos favoritos) o de una emisora del top a otra;
-- la lista **Emisora de radio** del dispositivo muestra sus favoritos (o el
-  top) para lanzar uno con un toque.
+- la lista **Emisora de radio** del dispositivo muestra primero sus
+  favoritos (★) y luego el top de su país, para lanzar una con un toque.
 
 ## Favoritos
 
 Hasta 30 favoritos, comunes a todos los altavoces:
 
-- el botón ☆ **Favorito** del widget _Radio – sonando_ añade la emisora
-  actual;
+- el botón **Elegir** del widget _Radio – sonando_ abre la lista de
+  emisoras (favoritos primero, luego el top): elija una emisora y marque
+  **Añadir a favoritos** para marcarla a la vez (elija la emisora que suena
+  para marcarla sin reiniciarla);
 - los botones **Añadir un favorito**, **Quitar un favorito** y **Ver los
   favoritos** de la configuración toman un nombre de emisora.
 
@@ -129,9 +136,11 @@ Hasta 30 favoritos, comunes a todos los altavoces:
 
 - **Radio – sonando** — la emisora de un altavoz, su logo, sus géneros y la
   calidad del flujo, con _Anterior_, _Detener_ / _Reproducir_, _Siguiente_ y
-  _Favorito_.
-- **Radios favoritas** — hasta tres emisoras escritas en los ajustes del
-  widget, lanzadas con un toque en un altavoz, y un botón _Detener_.
+  _Elegir_. La fila Flujo indica `(reserva)` en naranja cuando el altavoz
+  abandonó el flujo MP3 preferido y reproduce el original.
+- **Radios favoritas** — sus tres primeros favoritos como botones de un
+  toque para un altavoz (o hasta tres emisoras escritas en los ajustes del
+  widget), y un botón _Detener_.
 - **Top de radios** — las emisoras más escuchadas del país (o de un género),
   en cuadrícula con un enlace a su sitio web.
 

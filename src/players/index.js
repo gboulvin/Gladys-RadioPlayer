@@ -42,6 +42,18 @@ export function platformId(player) {
     .replace(/^-+|-+$/g, '');
 }
 
+/** The IP address a player is reached at. */
+export function playerHost(player) {
+  if (player.kind === 'cast') {
+    return player.description.host;
+  }
+  try {
+    return new URL(player.description.location).hostname;
+  } catch {
+    return null;
+  }
+}
+
 const paramValue = (device, name) => device.params?.find((p) => p.name === name)?.value;
 
 export class PlayerRegistry {
@@ -111,12 +123,21 @@ export class PlayerRegistry {
     };
     const found = [];
     // Sequential on purpose, see discover().
-    if (config.enable_upnp) {
-      found.push(...(await this.discoverUpnp(gladys, report.ssdp)));
+    let upnp = config.enable_upnp ? await this.discoverUpnp(gladys, report.ssdp) : [];
+    const cast = config.enable_cast ? await this.discoverCast(gladys, report.mdns) : [];
+    // An Android TV (or a speaker with Chromecast built-in) also answers as a
+    // DLNA renderer, whose stream support is far poorer: one physical device,
+    // two players, and only the Cast one plays reliably. Keep the Cast one.
+    const castHosts = new Set(cast.map((player) => player.description.host));
+    const duplicates = upnp.filter((player) => castHosts.has(playerHost(player)));
+    if (duplicates.length > 0) {
+      logger.info(
+        `Ignoring the DLNA side of ${duplicates.map((p) => p.name).join(', ')}: also a Google Cast device`,
+      );
+      upnp = upnp.filter((player) => !duplicates.includes(player));
     }
-    if (config.enable_cast) {
-      found.push(...(await this.discoverCast(gladys, report.mdns)));
-    }
+    report.ssdp.duplicates = duplicates.length;
+    found.push(...upnp, ...cast);
     const manual = await this.loadManual(config);
     report.manual.players = manual.length;
     found.push(...manual);

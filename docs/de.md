@@ -55,6 +55,12 @@ Französisch und Spanisch**.
 | Sonos       | Alle Sonos-Lautsprecher (S1 und S2)                                                                                             | SSDP          |
 | UPnP / DLNA | Netzwerk-Receiver (Denon, Marantz, Yamaha, Onkyo, Pioneer), Smart-TVs, Kodi, BubbleUPnP…                                        | SSDP          |
 
+Ein Android TV oder ein Lautsprecher mit Chromecast built-in antwortet oft
+auch als DLNA-Renderer, mit viel schlechterer Stream-Unterstützung: Ein
+solches Gerät wird nur einmal behalten, als Google Cast. Ein mit einer
+früheren Version erstelltes Duplikat kann aus der Geräteliste gelöscht
+werden.
+
 Ein Lautsprecher, den die Suche nicht sieht (anderes Subnetz, Router filtert
 Multicast), kann manuell hinzugefügt werden, siehe unten.
 
@@ -116,15 +122,17 @@ Jeder Lautsprecher ist ein **Musik-Player** in Gladys:
 - die Gerätekarte bietet Wiedergabe / Pause / Stopp, Lautstärke,
   Stummschaltung und **nächster / vorheriger Sender**: Sie wechseln zwischen
   Ihren Favoriten (ab zwei Favoriten), sonst zwischen den Top-Sendern;
-- die Auswahl **Radiosender** des Geräts listet Ihre Favoriten (oder die
-  Top-Sender) zum Starten per Fingertipp.
+- die Auswahl **Radiosender** des Geräts listet zuerst Ihre Favoriten (★),
+  dann die Top-Sender Ihres Landes, zum Starten per Fingertipp.
 
 ## Favoriten
 
 Bis zu 30 Favoriten, gemeinsam für alle Lautsprecher:
 
-- der Button ☆ **Favorit** des Widgets _Radio – läuft gerade_ fügt den
-  laufenden Sender hinzu;
+- der Button **Auswählen** des Widgets _Radio – läuft gerade_ öffnet die
+  Senderliste (Favoriten zuerst, dann die Top-Sender): Sender wählen und
+  **Zu Favoriten hinzufügen** ankreuzen, um ihn zugleich zu merken (den
+  laufenden Sender wählen, um ihn ohne Neustart zu merken);
 - die Buttons **Favorit hinzufügen**, **Favorit entfernen** und **Favoriten
   anzeigen** der Konfiguration nehmen einen Sendernamen.
 
@@ -132,9 +140,12 @@ Bis zu 30 Favoriten, gemeinsam für alle Lautsprecher:
 
 - **Radio – läuft gerade** — der Sender eines Lautsprechers, sein Logo,
   Genres und Streamqualität, mit _Zurück_, _Stopp_ / _Abspielen_, _Weiter_
-  und _Favorit_.
-- **Radio-Presets** — bis zu drei in den Widget-Einstellungen eingetragene
-  Sender, per Fingertipp auf einem Lautsprecher gestartet, plus _Stopp_.
+  und _Auswählen_. Die Stream-Zeile zeigt `(Ersatz)` in Orange, wenn der
+  Lautsprecher den bevorzugten MP3-Stream abgebrochen hat und den Original-
+  Stream spielt.
+- **Radio-Presets** — Ihre ersten drei Favoriten als Buttons für einen
+  Lautsprecher (oder bis zu drei in den Widget-Einstellungen eingetragene
+  Sender), plus _Stopp_.
 - **Top-Radiosender** — die meistgehörten Sender des Landes (oder eines
   Genres) als Raster mit Link zur Website.
 

@@ -1083,10 +1083,10 @@
         "es": "Radio – sonando"
       },
       "description": {
-        "en": "The station of a speaker, its logo, zapping buttons and a favorite star.",
-        "fr": "La station d'une enceinte, son logo, le zapping et l'étoile favori.",
-        "de": "Der Sender eines Lautsprechers, Logo, Senderwechsel und Favoritenstern.",
-        "es": "La emisora de un altavoz, su logo, cambio de emisora y estrella favorito."
+        "en": "The station of a speaker, its logo, zapping, and a list to choose and star a station.",
+        "fr": "La station d’une enceinte, son logo, le zapping et une liste pour choisir et mettre en favori.",
+        "de": "Sender eines Lautsprechers, Logo, Senderwechsel und eine Liste zum Wählen und Merken.",
+        "es": "La emisora de un altavoz, su logo, cambio y una lista para elegir y marcar favorita."
       },
       "icon": "radio",
       "settings": [
@@ -1114,10 +1114,10 @@
         "es": "Radios favoritas"
       },
       "description": {
-        "en": "Up to three one-tap stations for a speaker, and a Stop button.",
-        "fr": "Jusqu'à trois radios en un geste pour une enceinte, et un bouton Arrêter.",
-        "de": "Bis zu drei Sender per Fingertipp für einen Lautsprecher, plus Stopp.",
-        "es": "Hasta tres emisoras con un toque para un altavoz y un botón Detener."
+        "en": "One-tap stations for a speaker: your first 3 favorites, or the stations you type.",
+        "fr": "Radios en un geste pour une enceinte : vos 3 premiers favoris, ou les stations saisies.",
+        "de": "Sender per Fingertipp: Ihre ersten 3 Favoriten oder die eingetragenen Sender.",
+        "es": "Emisoras con un toque: sus 3 primeros favoritos o las emisoras que escriba."
       },
       "icon": "list",
       "settings": [
@@ -1147,8 +1147,7 @@
             "fr": "ex. France Inter",
             "de": "z. B. Deutschlandfunk",
             "es": "p. ej. Cadena SER"
-          },
-          "required": true
+          }
         },
         {
           "key": "preset_2",

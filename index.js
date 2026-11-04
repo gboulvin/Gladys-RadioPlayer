@@ -62,16 +62,17 @@ const NO_SPEAKER_FOUND = text(
 let discovered = [];
 
 // The stations listed in the "Radio station" select of every player.
+// The favorites first (★), then the most listened stations of the country.
 async function stationOptions() {
-  if (store.favorites.length > 0) {
-    return store.favorites;
-  }
-  return catalog
-    .topStations(config.country, { limit: 15, excludeHls: config.exclude_hls })
+  const top = await catalog
+    .topStations(config.country, { limit: 30, excludeHls: config.exclude_hls })
     .catch((err) => {
       logger.warn(`Top stations unavailable: ${err.message}`);
       return [];
     });
+  const favorites = store.favorites.map((fav) => ({ uuid: fav.uuid, name: `★ ${fav.name}` }));
+  const seen = new Set(favorites.map((fav) => fav.uuid));
+  return [...favorites, ...top.filter((station) => !seen.has(station.uuid))];
 }
 
 async function publishDevices({ scan }) {
@@ -182,12 +183,12 @@ for (const [key, handler] of Object.entries(sceneActions)) {
 }
 
 // --- Dashboard widgets ---------------------------------------------------------
-const widgets = createWidgets({ radio, catalog, store, logos, getConfig });
+const widgets = createWidgets({ radio, catalog, store, logos, getConfig, onFavoritesChanged });
 for (const [key, widget] of Object.entries(widgets)) {
   gladys.onWidgetGet(key, (request) => widget.get(request));
   if (typeof widget.action === 'function') {
-    gladys.onWidgetAction(key, (actionKey, params, { settings }) =>
-      widget.action(gladys, { actionKey, params, settings }),
+    gladys.onWidgetAction(key, (actionKey, params, { settings, values }) =>
+      widget.action(gladys, { actionKey, params, settings, values }),
     );
   }
 }

@@ -84,8 +84,21 @@ export function parseDeviceDescription(xml, location) {
 }
 
 /** DIDL-Lite metadata of a radio stream (title + artwork on the renderer screen). */
+// DLNA profile flags: many TVs and receivers only accept a resource whose
+// protocolInfo names its DLNA profile; OP=00 (no seek) and the streaming
+// flags tell them it is a live stream of unknown length.
+const DLNA_PROFILES = { 'audio/mpeg': 'MP3', 'audio/aac': 'AAC_ADTS_320' };
+const DLNA_LIVE_FLAGS =
+  'DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01700000000000000000000000000000';
+
+export function protocolInfo(station) {
+  const type = streamContentType(station);
+  const profile = DLNA_PROFILES[type];
+  return `http-get:*:${type}:${profile ? `DLNA.ORG_PN=${profile};` : ''}${DLNA_LIVE_FLAGS}`;
+}
+
 export function didlMetadata(station, uri) {
-  const protocolInfo = `http-get:*:${streamContentType(station)}:*`;
+  const info = protocolInfo(station);
   return (
     '<DIDL-Lite xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/" ' +
     'xmlns:dc="http://purl.org/dc/elements/1.1/" ' +
@@ -94,7 +107,7 @@ export function didlMetadata(station, uri) {
     `<dc:title>${escapeXml(station.name)}</dc:title>` +
     '<upnp:class>object.item.audioItem.audioBroadcast</upnp:class>' +
     (station.favicon ? `<upnp:albumArtURI>${escapeXml(station.favicon)}</upnp:albumArtURI>` : '') +
-    `<res protocolInfo="${escapeXml(protocolInfo)}">${escapeXml(uri)}</res>` +
+    `<res protocolInfo="${escapeXml(info)}">${escapeXml(uri)}</res>` +
     '</item></DIDL-Lite>'
   );
 }

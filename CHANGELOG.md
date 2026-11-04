@@ -10,6 +10,31 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- _Radio – now playing_ widget: a **Choose** button opens the station list
+  (favorites first, then the top stations of the country) with an **Add to
+  favorites** box, to pick and star a station in one go.
+- _Radio presets_ widget: with no station typed in its settings, it shows the
+  first three favorites as one-tap buttons.
+- The stream row of the _Radio – now playing_ widget flags a fallback stream
+  (`(fallback)`, in orange).
+
+### Changed
+
+- The **Radio station** select of a speaker lists the favorites (★) first,
+  then the top stations of the country (it only showed one or the other).
+- The _Favorite_ button of the _Radio – now playing_ widget is replaced by the
+  **Add to favorites** box of the **Choose** list.
+- DLNA renderers receive the DLNA profile of the stream (MP3, AAC), which
+  many TVs and receivers require.
+
+### Fixed
+
+- An Android TV (or a speaker with Chromecast built-in) showed up twice, as
+  Google Cast and as a DLNA renderer that could not play the stations: a
+  device answering both ways is now kept once, as Google Cast.
+
 ## [1.1.1] - 2026-11-04
 
 ### Added

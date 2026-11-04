@@ -131,7 +131,8 @@ export class RadioService {
     for (let i = 0; i < streams.length; i += 1) {
       try {
         await player.play(streams[i], options);
-        return await this.started(deviceExternalId, streams[i], streams.slice(i + 1), options);
+        const stream = i > 0 ? { ...streams[i], fallback: true } : streams[i];
+        return await this.started(deviceExternalId, stream, streams.slice(i + 1), options);
       } catch (err) {
         lastError = err;
         logger.warn(`${player.name} refused ${streams[i].url}: ${err.message}`);

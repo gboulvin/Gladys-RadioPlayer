@@ -55,6 +55,11 @@ in **English, French, German and Spanish**.
 | Sonos       | All Sonos speakers (S1 and S2)                                                                                               | SSDP     |
 | UPnP / DLNA | Network receivers (Denon, Marantz, Yamaha, Onkyo, Pioneer), smart TVs, Freebox Player, Kodi, BubbleUPnP…                     | SSDP     |
 
+An Android TV, or a speaker with Chromecast built-in, often also answers as
+a DLNA renderer, with far poorer stream support: such a device is kept once,
+as Google Cast. A duplicate created with an earlier version can be deleted
+from the device list.
+
 A speaker the scan cannot see (another subnet, a router filtering multicast)
 can be added by hand, see below.
 
@@ -110,25 +115,29 @@ Every speaker is a Gladys **music player**:
 - the device card shows play / pause / stop, the volume, mute, and **next /
   previous station**: they zap between your favorites (from two favorites
   on), or the top stations of your country otherwise;
-- the **Radio station** select of the device lists your favorites (or the top
-  stations) to pick one in a tap.
+- the **Radio station** select of the device lists your favorites (★)
+  first, then the top stations of your country, to pick one in a tap.
 
 ## Favorites
 
 Up to 30 favorites, shared by all the speakers:
 
-- the ☆ **Favorite** button of the _Now playing_ widget adds the current
-  station;
+- the **Choose** button of the _Radio – now playing_ widget opens the station
+  list (favorites first, then the top stations): pick a station, and tick
+  **Add to favorites** to star it at the same time (pick the station playing
+  to star it without restarting it);
 - the **Add a favorite**, **Remove a favorite** and **List the favorites**
   buttons of the Configuration screen take a station name.
 
 ## Dashboard widgets
 
 - **Radio – now playing** — the station of a speaker, its logo, its genres and
-  stream quality, and the _Previous_, _Stop_ / _Play_, _Next_ and _Favorite_
-  buttons.
-- **Radio presets** — up to three stations you type in the widget settings,
-  played in one tap on a speaker, and a _Stop_ button.
+  stream quality, and the _Previous_, _Stop_ / _Play_, _Next_ and _Choose_
+  buttons. The stream row says `(fallback)` in orange when the speaker
+  dropped the preferred MP3 stream and plays the original one.
+- **Radio presets** — your first three favorites as one-tap buttons for a
+  speaker (or up to three stations you type in the widget settings), and a
+  _Stop_ button.
 - **Top radio stations** — the most listened stations of the country (or of
   one genre), as a poster grid with a link to their website.
 

@@ -341,3 +341,32 @@ test('a failing channel is reported, the other one still works', async () => {
   assert.match(report.mdns.error, /not declared/);
   assert.deepEqual(report.players, [{ name: 'Salon & Cuisine', kind: 'upnp' }]);
 });
+
+test('a TV answering as Google Cast and as DLNA is kept once, as Google Cast', async () => {
+  const renderer = fakeUpnpRenderer({ host: '192.168.1.50' });
+  const gladys = createFakeGladys({
+    scanResults: {
+      ssdp: [
+        {
+          source_ip: '192.168.1.50',
+          source_port: 1900,
+          headers:
+            'HTTP/1.1 200 OK\r\nLOCATION: http://192.168.1.50:1400/xml/device_description.xml\r\n\r\n',
+        },
+      ],
+      mdns: [MDNS_ANSWER],
+    },
+  });
+  const registry = new PlayerRegistry({ fetch: renderer.fetch, castConnect: async () => null });
+  const { players, report } = await registry.discover(gladys, {
+    enable_upnp: true,
+    enable_cast: true,
+    manual_players: '',
+  });
+  assert.deepEqual(
+    players.map((p) => p.kind),
+    ['cast'],
+  );
+  assert.equal(report.ssdp.duplicates, 1);
+  registry.closeAll();
+});

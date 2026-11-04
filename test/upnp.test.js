@@ -88,7 +88,7 @@ test('the DIDL metadata is escaped and typed as a broadcast', () => {
   const didl = didlMetadata(station, station.url);
   assert.match(didl, /<dc:title>Rock &amp; &lt;Roll&gt;<\/dc:title>/);
   assert.match(didl, /object\.item\.audioItem\.audioBroadcast/);
-  assert.match(didl, /protocolInfo="http-get:\*:audio\/mpeg:\*"/);
+  assert.match(didl, /protocolInfo="http-get:\*:audio\/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=00;/);
 });
 
 test('transport states map to the playback states', () => {

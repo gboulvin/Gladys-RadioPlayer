@@ -44,27 +44,96 @@ test('every widget content is rendered exactly as sent, in every state', async (
   }
 });
 
-test('now_playing shows the station, its logo and the favorite star', async () => {
+test('now_playing shows the station, its logo and a "Choose" list', async () => {
   const ctx = await setup();
   try {
     const widgets = await widgetsFor(ctx);
     const device = ctx.sonos.external_id;
+    await ctx.store.addFavorite({
+      uuid: '22222222-2222-2222-2222-222222222222',
+      name: 'Jazz Club',
+    });
     await ctx.radio.playQuery(device, 'Radio Test');
     const content = await widgets.now_playing.get(request({ device }));
     assert.equal(content.components[0].text, 'Radio Test');
     assert.ok(content.components.some((c) => c.type === 'image' && c.key.startsWith('logo-')));
-    const actions = content.components.filter((c) => c.type === 'button').map((c) => c.action.key);
-    assert.deepEqual(actions, ['previous', 'stop', 'next', 'favorite']);
+    const buttons = content.components.filter((c) => c.type === 'button');
+    assert.deepEqual(
+      buttons.map((c) => c.action.key),
+      ['previous', 'stop', 'next', 'choose'],
+    );
+    const [station, favorite] = buttons[3].action.fields;
+    // Favorites first, then the top stations without duplicates.
+    assert.deepEqual(
+      station.options.map((o) => o.label.en),
+      ['★ Jazz Club', 'Radio Test'],
+    );
+    assert.equal(station.default, '11111111-1111-1111-1111-111111111111');
+    assert.equal(favorite.type, 'boolean');
 
+    // Star the station playing: nothing is replayed.
     const toast = await widgets.now_playing.action(null, {
-      actionKey: 'favorite',
+      actionKey: 'choose',
       params: {},
       settings: { device },
+      values: { station: '11111111-1111-1111-1111-111111111111', favorite: true },
     });
     assert.equal(toast.fr, 'Radio Test ajoutée aux favoris');
-    assert.equal(ctx.store.favorites.length, 1);
-    const after = await widgets.now_playing.get(request({ device }));
-    assert.ok(!after.components.some((c) => c.action?.key === 'favorite'));
+    assert.deepEqual(
+      ctx.store.favorites.map((f) => f.name),
+      ['Jazz Club', 'Radio Test'],
+    );
+    assert.equal(ctx.renderer.state.actions.filter((a) => a === 'SetAVTransportURI').length, 1);
+
+    // Pick another station from the list: it plays.
+    const played = await widgets.now_playing.action(null, {
+      actionKey: 'choose',
+      params: {},
+      settings: { device },
+      values: { station: '22222222-2222-2222-2222-222222222222', favorite: false },
+    });
+    assert.equal(played, 'Jazz Club');
+    assert.equal(ctx.radio.current(device).name, 'Jazz Club');
+  } finally {
+    ctx.close();
+  }
+});
+
+test('radio_presets shows the first favorites when no preset is typed', async () => {
+  const ctx = await setup();
+  try {
+    const widgets = await widgetsFor(ctx);
+    const device = ctx.sonos.external_id;
+    const empty = await widgets.radio_presets.get(request({ device }));
+    assert.ok(empty.components.some((c) => c.type === 'text' && c.variant === 'body'));
+    assert.deepEqual(validateWidgetContent(empty), []);
+    await ctx.store.addFavorite({
+      uuid: '22222222-2222-2222-2222-222222222222',
+      name: 'Jazz Club',
+    });
+    const content = await widgets.radio_presets.get(request({ device }));
+    assert.deepEqual(
+      content.components.filter((c) => c.type === 'button').map((c) => c.label.en ?? c.label),
+      ['Jazz Club', 'Stop'],
+    );
+  } finally {
+    ctx.close();
+  }
+});
+
+test('the stream row flags a fallback stream', async () => {
+  const ctx = await setup();
+  try {
+    const widgets = await widgetsFor(ctx);
+    const device = ctx.nest.external_id;
+    await ctx.radio.playQuery(device, 'Jazz Club');
+    ctx.radio.status(device).station.fallback = true;
+    const content = await widgets.now_playing.get(request({ device }));
+    const row = content.components
+      .find((c) => c.type === 'status')
+      .items.find((i) => i.icon === 'radio');
+    assert.equal(row.value.fr, 'AAC · 128 kbps (secours)');
+    assert.equal(row.color, 'warning');
   } finally {
     ctx.close();
   }

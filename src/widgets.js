@@ -32,7 +32,11 @@ const ACTIONS = {
   PREVIOUS: 'previous',
   FAVORITE: 'favorite',
   PLAY_STATION: 'play_station',
+  CHOOSE: 'choose',
 };
+
+// How many top stations the "Choose a station" list offers after the favorites.
+const CHOICE_TOP_SIZE = 40;
 
 const STATE_ROWS = {
   PLAYING: {
@@ -75,7 +79,7 @@ const noPlayer = () => ({
   ],
 });
 
-export function createWidgets({ radio, catalog, store, logos, getConfig }) {
+export function createWidgets({ radio, catalog, store, logos, getConfig, onFavoritesChanged }) {
   function stateRow(device) {
     const status = radio.status(device);
     const key = status?.unreachable ? 'UNREACHABLE' : (status?.state ?? 'IDLE');
@@ -86,7 +90,54 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
     };
   }
 
-  async function playerAction(actionKey, params, settings) {
+  async function addFavorite(station) {
+    const result = await store.addFavorite(station);
+    if (result === 'full') {
+      return text(
+        'Favorites are full (30)',
+        'Favoris pleins (30)',
+        'Favoriten voll (30)',
+        'Favoritos llenos (30)',
+      );
+    }
+    if (result === 'added') {
+      await onFavoritesChanged?.();
+    }
+    return mapText(
+      text(
+        '%s added to favorites',
+        '%s ajoutée aux favoris',
+        '%s zu Favoriten hinzugefügt',
+        '%s añadida a favoritos',
+      ),
+      (t) => truncate(t.replace('%s', station.name), 200),
+    );
+  }
+
+  /**
+   * The options of the "Choose a station" list: the favorites first (★),
+   * then the most listened stations of the country.
+   */
+  async function stationChoices() {
+    const config = getConfig();
+    const top = await catalog
+      .topStations(config.country, { limit: CHOICE_TOP_SIZE, excludeHls: config.exclude_hls })
+      .catch((err) => {
+        logger.warn(`Top stations unavailable: ${err.message}`);
+        return [];
+      });
+    const favorites = store.favorites.map((fav) => ({
+      value: fav.uuid,
+      label: { en: truncate(`★ ${fav.name}`, 60) },
+    }));
+    const seen = new Set(favorites.map((option) => option.value));
+    const others = top
+      .filter((station) => !seen.has(station.uuid))
+      .map((station) => ({ value: station.uuid, label: { en: truncate(station.name, 60) } }));
+    return [...favorites, ...others];
+  }
+
+  async function playerAction(actionKey, params, settings, values) {
     const device = settings?.device;
     if (!device) {
       throw new Error('No player selected in the widget settings');
@@ -118,24 +169,21 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
             'No suena nada',
           );
         }
-        const result = await store.addFavorite(station);
-        if (result === 'full') {
-          return text(
-            'Favorites are full (30)',
-            'Favoris pleins (30)',
-            'Favoriten voll (30)',
-            'Favoritos llenos (30)',
-          );
+        return addFavorite(station);
+      }
+      case ACTIONS.CHOOSE: {
+        // `values` is the form typed by the user, validated by the core
+        // against the select options this content declared.
+        const uuid = values?.station;
+        if (!uuid) {
+          throw new Error('No station chosen');
         }
-        return mapText(
-          text(
-            '%s added to favorites',
-            '%s ajoutée aux favoris',
-            '%s zu Favoriten hinzugefügt',
-            '%s añadida a favoritos',
-          ),
-          (t) => truncate(t.replace('%s', station.name), 200),
-        );
+        const current = radio.current(device);
+        const station = current?.uuid === uuid ? current : await radio.playUuid(device, uuid);
+        if (values.favorite === true && !store.isFavorite(uuid)) {
+          return addFavorite(station);
+        }
+        return truncate(station.name, 200);
       }
       default:
         throw new Error(`Unknown widget action: ${actionKey}`);
@@ -171,7 +219,7 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
         }
         const rows = [stateRow(device)];
         if (station) {
-          if (station.tags.length > 0) {
+          if ((station.tags ?? []).length > 0) {
             rows.push({
               label: text('Genres', 'Genres', 'Genres', 'Géneros'),
               icon: 'music',
@@ -180,11 +228,18 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
             });
           }
           if (streamLabel(station)) {
+            // The codec of the stream really sent to the speaker. A fallback
+            // means the preferred one (MP3) was dropped by this speaker.
             rows.push({
               label: text('Stream', 'Flux', 'Stream', 'Flujo'),
               icon: 'radio',
-              value: streamLabel(station),
-              color: WIDGET_COLORS.NEUTRAL,
+              value: station.fallback
+                ? mapText(
+                    text('%s (fallback)', '%s (secours)', '%s (Ersatz)', '%s (reserva)'),
+                    (t) => t.replace('%s', streamLabel(station)),
+                  )
+                : streamLabel(station),
+              color: station.fallback ? WIDGET_COLORS.WARNING : WIDGET_COLORS.NEUTRAL,
             });
           }
         }
@@ -220,20 +275,47 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
             action: { key: ACTIONS.NEXT },
           },
         );
-        if (station && !store.isFavorite(station.uuid)) {
+        const choices = await stationChoices();
+        if (choices.length > 0) {
+          const preselected = choices.some((c) => c.value === station?.uuid)
+            ? station.uuid
+            : choices[0].value;
           components.push({
             type: 'button',
-            label: text('Favorite', 'Favori', 'Favorit', 'Favorito'),
-            icon: 'star',
-            style: 'secondary',
-            action: { key: ACTIONS.FAVORITE },
+            label: text('Choose', 'Choisir', 'Auswählen', 'Elegir'),
+            icon: 'list',
+            style: 'primary',
+            action: {
+              key: ACTIONS.CHOOSE,
+              fields: [
+                {
+                  key: 'station',
+                  type: 'select',
+                  label: text('Station', 'Station', 'Sender', 'Emisora'),
+                  required: true,
+                  default: preselected,
+                  options: choices,
+                },
+                {
+                  key: 'favorite',
+                  type: 'boolean',
+                  label: text(
+                    'Add to favorites',
+                    'Ajouter aux favoris',
+                    'Zu Favoriten hinzufügen',
+                    'Añadir a favoritos',
+                  ),
+                  default: false,
+                },
+              ],
+            },
           });
         }
         // Refreshed on every change radio.js observes: the TTL is a safety net.
         return { ttl_seconds: 60, components };
       },
-      action: (gladys, { actionKey, params, settings }) =>
-        playerAction(actionKey, params, settings),
+      action: (gladys, { actionKey, params, settings, values }) =>
+        playerAction(actionKey, params, settings, values),
     },
 
     [WIDGET_KEYS.RADIO_PRESETS]: {
@@ -246,16 +328,20 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
         const names = [settings.preset_1, settings.preset_2, settings.preset_3]
           .map((name) => String(name ?? '').trim())
           .filter(Boolean);
-        const presets = await Promise.all(
-          names.map((name) =>
-            catalog
-              .findStation(name, { country: config.country, excludeHls: config.exclude_hls })
-              .catch((err) => {
-                logger.warn(`Preset "${name}" not resolved: ${err.message}`);
-                return null;
-              }),
-          ),
-        );
+        // No preset typed: the first three favorites are the presets.
+        const fromFavorites = names.length === 0;
+        const presets = fromFavorites
+          ? store.favorites.slice(0, 3)
+          : await Promise.all(
+              names.map((name) =>
+                catalog
+                  .findStation(name, { country: config.country, excludeHls: config.exclude_hls })
+                  .catch((err) => {
+                    logger.warn(`Preset "${name}" not resolved: ${err.message}`);
+                    return null;
+                  }),
+              ),
+            );
         const current = radio.current(device);
         const rows = [stateRow(device)];
         if (current) {
@@ -283,6 +369,18 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
           { type: 'text', variant: 'caption', text: truncate(radio.playerName(device), 80) },
           { type: 'status', items: rows.slice(0, 10) },
         ];
+        if (fromFavorites && presets.length === 0) {
+          components.push({
+            type: 'text',
+            variant: 'body',
+            text: text(
+              'Your first three favorites show up here. Add some with the "Choose" button of the "Radio – now playing" widget, or type stations in the widget settings.',
+              'Vos trois premiers favoris s’affichent ici. Ajoutez-en avec le bouton « Choisir » du widget « Radio en cours », ou saisissez des stations dans les réglages du widget.',
+              'Ihre ersten drei Favoriten erscheinen hier. Fügen Sie welche über „Auswählen“ im Widget „Radio – läuft gerade“ hinzu oder tragen Sie Sender in den Widget-Einstellungen ein.',
+              'Aquí aparecen sus tres primeros favoritos. Añádalos con el botón «Elegir» del widget «Radio – sonando» o escriba emisoras en los ajustes del widget.',
+            ),
+          });
+        }
         for (const station of presets.filter(Boolean)) {
           components.push({
             type: 'button',
@@ -301,8 +399,8 @@ export function createWidgets({ radio, catalog, store, logos, getConfig }) {
         });
         return { ttl_seconds: 120, components };
       },
-      action: (gladys, { actionKey, params, settings }) =>
-        playerAction(actionKey, params, settings),
+      action: (gladys, { actionKey, params, settings, values }) =>
+        playerAction(actionKey, params, settings, values),
     },
 
     [WIDGET_KEYS.TOP_STATIONS]: {

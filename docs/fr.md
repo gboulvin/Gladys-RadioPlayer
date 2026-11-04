@@ -58,6 +58,11 @@ L'écran de configuration, la documentation et les messages existent en
 | Sonos       | Toutes les enceintes Sonos (S1 et S2)                                                                                        | SSDP         |
 | UPnP / DLNA | Amplis réseau (Denon, Marantz, Yamaha, Onkyo, Pioneer), téléviseurs, Freebox Player, Kodi, BubbleUPnP…                       | SSDP         |
 
+Une Android TV, ou une enceinte avec Chromecast intégré, répond souvent
+aussi comme lecteur DLNA, bien moins compatible avec les flux : un tel
+appareil n'est gardé qu'une fois, en Google Cast. Un doublon créé avec une
+version précédente peut être supprimé de la liste des appareils.
+
 Une enceinte que la recherche ne voit pas (autre sous-réseau, box qui filtre
 le multicast) peut être ajoutée à la main, voir plus bas.
 
@@ -117,15 +122,19 @@ Chaque enceinte est un **lecteur de musique** Gladys :
 - la carte de l'appareil propose lecture / pause / arrêt, le volume, la
   sourdine et **station suivante / précédente** : elles passent d'un favori
   à l'autre (dès deux favoris), sinon d'une radio du top à l'autre ;
-- la liste **Station de radio** de l'appareil propose vos favoris (ou le
-  top) pour en lancer un en un geste.
+- la liste **Station de radio** de l'appareil propose vos favoris (★) en
+  premier, puis le top des radios de votre pays, pour en lancer une en un
+  geste.
 
 ## Favoris
 
 Jusqu'à 30 favoris, communs à toutes les enceintes :
 
-- le bouton ☆ **Favori** du widget _Radio en cours_ ajoute la station
-  écoutée ;
+- le bouton **Choisir** du widget _Radio en cours_ ouvre la liste des
+  stations (favoris en tête, puis le top) : choisissez une station, et
+  cochez **Ajouter aux favoris** pour la mettre en favori en même temps
+  (choisissez la station en cours pour la mettre en favori sans la
+  relancer) ;
 - les boutons **Ajouter un favori**, **Retirer un favori** et **Lister les
   favoris** de l'écran de configuration prennent un nom de station.
 
@@ -133,9 +142,11 @@ Jusqu'à 30 favoris, communs à toutes les enceintes :
 
 - **Radio en cours** — la station d'une enceinte, son logo, ses genres et la
   qualité du flux, et les boutons _Précédente_, _Arrêter_ / _Lancer_,
-  _Suivante_ et _Favori_.
-- **Radios préférées** — jusqu'à trois stations saisies dans les réglages du
-  widget, lancées d'un geste sur une enceinte, et un bouton _Arrêter_.
+  _Suivante_ et _Choisir_. La ligne Flux indique `(secours)` en orange quand
+  l'enceinte a abandonné le flux MP3 préféré et joue le flux d'origine.
+- **Radios préférées** — vos trois premiers favoris en boutons à un geste
+  pour une enceinte (ou jusqu'à trois stations saisies dans les réglages du
+  widget), et un bouton _Arrêter_.
 - **Top des radios** — les stations les plus écoutées du pays (ou d'un
   genre), en grille d'affiches avec un lien vers leur site.
 
