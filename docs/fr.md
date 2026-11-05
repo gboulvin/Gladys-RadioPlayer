@@ -83,10 +83,10 @@ le multicast) peut être ajoutée à la main, voir plus bas.
      Google Cast ;
    - **Enceintes Google Cast** / **Enceintes Sonos et UPnP/DLNA** —
      désactivez une famille que vous n'utilisez pas ;
-   - **Enceintes ajoutées à la main** — l'adresse IP d'un appareil Google
-     Cast (ex. `192.168.1.20`) ou l'URL d'une description UPnP (ex.
-     `http://192.168.1.30:1400/xml/device_description.xml` pour une Sonos),
-     séparées par des virgules.
+   - **Enceintes ajoutées à la main** — l'adresse IP d'une Sonos ou d'un
+     appareil Google Cast (ex. `192.168.1.20` : une Sonos est reconnue toute
+     seule, toute autre IP est traitée comme Google Cast), ou l'URL de la
+     description UPnP d'un autre lecteur DLNA, séparées par des virgules.
 4. Enregistrez, ouvrez l'onglet **Découverte** et ajoutez vos enceintes.
 
 ## Boutons de l'écran de configuration

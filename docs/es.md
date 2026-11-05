@@ -80,10 +80,10 @@ multicast) puede añadirse a mano, ver más abajo.
      Cast;
    - **Altavoces Google Cast** / **Altavoces Sonos y UPnP/DLNA** — desactive
      una familia que no use;
-   - **Altavoces añadidos a mano** — la dirección IP de un dispositivo Google
-     Cast (p. ej. `192.168.1.20`) o la URL de una descripción UPnP (p. ej.
-     `http://192.168.1.30:1400/xml/device_description.xml` para un Sonos),
-     separadas por comas.
+   - **Altavoces añadidos a mano** — la dirección IP de un Sonos o de un
+     dispositivo Google Cast (p. ej. `192.168.1.20`: un Sonos se reconoce
+     solo, cualquier otra IP se trata como Google Cast) o la URL de la
+     descripción UPnP de otro reproductor DLNA, separadas por comas.
 4. Guarde, abra la pestaña **Descubrimiento** y añada sus altavoces.
 
 ## Botones de la configuración

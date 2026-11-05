@@ -79,10 +79,10 @@ can be added by hand, see below.
      streams: leave it on, unless all your speakers are Google Cast;
    - **Google Cast speakers** / **Sonos and UPnP/DLNA speakers** — turn off a
      family you do not use;
-   - **Speakers added by hand** — the IP address of a Google Cast device
-     (e.g. `192.168.1.20`), or the URL of a UPnP description (e.g.
-     `http://192.168.1.30:1400/xml/device_description.xml` for a Sonos),
-     separated by commas.
+   - **Speakers added by hand** — the IP address of a Sonos or Google Cast
+     device (e.g. `192.168.1.20`: a Sonos is recognised by itself, any other
+     IP is taken as Google Cast), or the URL of the UPnP description of
+     another DLNA renderer, separated by commas.
 4. Save, open the **Discovery** tab and add your speakers.
 
 ## Configuration screen buttons

@@ -81,11 +81,10 @@ Multicast), kann manuell hinzugefügt werden, siehe unten.
      Google Cast;
    - **Google-Cast-Lautsprecher** / **Sonos- und UPnP/DLNA-Lautsprecher** —
      eine nicht genutzte Familie abschalten;
-   - **Manuell hinzugefügte Lautsprecher** — die IP-Adresse eines
-     Google-Cast-Geräts (z. B. `192.168.1.20`) oder die URL einer
-     UPnP-Beschreibung (z. B.
-     `http://192.168.1.30:1400/xml/device_description.xml` für Sonos), mit
-     Kommas getrennt.
+   - **Manuell hinzugefügte Lautsprecher** — die IP-Adresse eines Sonos- oder
+     Google-Cast-Geräts (z. B. `192.168.1.20`: ein Sonos wird selbst erkannt,
+     jede andere IP gilt als Google Cast) oder die URL der UPnP-Beschreibung
+     eines anderen DLNA-Renderers, mit Kommas getrennt.
 4. Speichern, Tab **Erkennung** öffnen und die Lautsprecher hinzufügen.
 
 ## Buttons der Konfiguration

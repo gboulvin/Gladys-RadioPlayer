@@ -22,15 +22,15 @@ test('normalizeConfig applies the defaults and fixes the types', () => {
   assert.equal(normalizeConfig({ country: 'ZZ' }).country, 'FR');
 });
 
-test('parseManualPlayers reads Cast IPs and UPnP URLs, ignores the rest', () => {
+test('parseManualPlayers reads IPs and UPnP URLs, ignores the rest', () => {
   assert.deepEqual(
     parseManualPlayers(
       '192.168.1.20, http://192.168.1.30:1400/xml/device_description.xml; 10.0.0.5:8010 hello',
     ),
     [
-      { kind: 'cast', host: '192.168.1.20', port: 8009 },
+      { kind: 'ip', host: '192.168.1.20', port: null },
       { kind: 'upnp', location: 'http://192.168.1.30:1400/xml/device_description.xml' },
-      { kind: 'cast', host: '10.0.0.5', port: 8010 },
+      { kind: 'ip', host: '10.0.0.5', port: 8010 },
     ],
   );
   assert.deepEqual(parseManualPlayers(''), []);

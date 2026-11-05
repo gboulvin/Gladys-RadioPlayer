@@ -10,6 +10,14 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Fixed
+
+- A Sonos added by its IP address in **Speakers added by hand** was taken
+  for a Google Cast device and could not play. A bare IP is now probed: a
+  Sonos is recognised by its UPnP description (port 1400), any other IP stays
+  Google Cast. The wrong "Google Cast <IP>" devices created before can be
+  deleted, then the Sonos added again from the Discovery tab.
+
 ## [1.2.0] - 2026-11-04
 
 ### Added

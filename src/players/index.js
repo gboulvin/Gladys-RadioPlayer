@@ -25,6 +25,10 @@ const logger = createLogger({ name: 'players' });
 // while keeping the two sequential scans under 15 s.
 export const SCAN_TIMEOUT_SECONDS = 5;
 
+// Where a Sonos player serves its UPnP device description.
+const SONOS_PORT = 1400;
+const SONOS_DESCRIPTION_PATH = '/xml/device_description.xml';
+
 export const PARAMS = {
   KIND: 'PLAYER_KIND',
   LOCATION: 'LOCATION',
@@ -241,6 +245,38 @@ export class PlayerRegistry {
     }
   }
 
+  /**
+   * What answers at an IP typed by hand. A Sonos serves its UPnP description
+   * on port 1400: try it first, and fall back to Google Cast (port 8009),
+   * which has no plain-HTTP identity to probe.
+   */
+  async probeIp({ host, port }) {
+    if (port === null || port === SONOS_PORT) {
+      const location = `http://${host}:${SONOS_PORT}${SONOS_DESCRIPTION_PATH}`;
+      const player = await loadUpnpPlayer(location, { fetch: this.fetch }).catch((err) => {
+        logger.debug(`${host}: no Sonos / UPnP description (${err.message})`);
+        return null;
+      });
+      if (player) {
+        logger.info(`Manual player ${host}: ${player.name} (UPnP / Sonos)`);
+        return player;
+      }
+      if (port === SONOS_PORT) {
+        logger.warn(`Manual player ${host}:${SONOS_PORT} does not answer as a Sonos`);
+        return null;
+      }
+    }
+    // A Cast device typed by IP: its id is its address, there is no mDNS
+    // record to read the real one from.
+    logger.info(`Manual player ${host}: Google Cast`);
+    return this.createCast({
+      id: `ip-${host.replace(/\./g, '-')}`,
+      name: `Google Cast ${host}`,
+      host,
+      port: port ?? 8009,
+    });
+  }
+
   async loadManual(config) {
     const players = [];
     for (const entry of parseManualPlayers(config.manual_players)) {
@@ -253,16 +289,10 @@ export class PlayerRegistry {
           players.push(player);
         }
       } else {
-        // A Cast device typed by IP: its id is its address, there is no mDNS
-        // record to read the real one from.
-        players.push(
-          this.createCast({
-            id: `ip-${entry.host.replace(/\./g, '-')}`,
-            name: `Google Cast ${entry.host}`,
-            host: entry.host,
-            port: entry.port,
-          }),
-        );
+        const player = await this.probeIp(entry);
+        if (player) {
+          players.push(player);
+        }
       }
     }
     return players;

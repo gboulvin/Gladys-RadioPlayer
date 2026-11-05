@@ -63,7 +63,7 @@ export function normalizeConfig(raw = {}) {
 
 /**
  * Parse the `manual_players` field: "192.168.1.20, http://192.168.1.30:1400/xml/device_description.xml"
- * -> [{ kind: 'cast', host }, { kind: 'upnp', location }]. Anything else is ignored.
+ * -> [{ kind: 'ip', host, port }, { kind: 'upnp', location }]. Anything else is ignored.
  * @param {string} value
  */
 export function parseManualPlayers(value) {
@@ -80,8 +80,10 @@ export function parseManualPlayers(value) {
         // Not a URL: ignored.
       }
     } else if (/^(\d{1,3}\.){3}\d{1,3}(:\d{1,5})?$/.test(entry)) {
+      // A bare IP can be a Sonos or a Google Cast device: the registry
+      // probes it (see PlayerRegistry.loadManual).
       const [host, port] = entry.split(':');
-      players.push({ kind: 'cast', host, port: port ? Number(port) : 8009 });
+      players.push({ kind: 'ip', host, port: port ? Number(port) : null });
     }
   }
   return players;

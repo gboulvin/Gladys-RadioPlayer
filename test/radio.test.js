@@ -370,3 +370,24 @@ test('a TV answering as Google Cast and as DLNA is kept once, as Google Cast', a
   assert.equal(report.ssdp.duplicates, 1);
   registry.closeAll();
 });
+
+test('a Sonos typed by its bare IP is found as a Sonos, a Cast IP stays Google Cast', async () => {
+  const renderer = fakeUpnpRenderer({ host: '192.168.1.30' });
+  const registry = new PlayerRegistry({ fetch: renderer.fetch, castConnect: async () => null });
+  const gladys = createFakeGladys();
+  const { players } = await registry.discover(gladys, {
+    enable_upnp: false,
+    enable_cast: false,
+    // The Sonos, the same Sonos with its port, a Cast IP, a dead Sonos port.
+    manual_players: '192.168.1.30, 192.168.1.30:1400, 192.168.1.77, 192.168.1.78:1400',
+  });
+  assert.deepEqual(
+    players.map((p) => [p.kind, p.name]),
+    [
+      ['upnp', 'Salon & Cuisine'],
+      ['cast', 'Google Cast 192.168.1.77'],
+    ],
+  );
+  assert.equal(players[0].description.sonos, true);
+  registry.closeAll();
+});

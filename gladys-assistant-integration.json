@@ -410,10 +410,10 @@
         "es": "Altavoces añadidos a mano"
       },
       "description": {
-        "en": "For a speaker the scan does not find: the IP address of a Google Cast device, or the URL of a UPnP description. Separate several entries with commas.",
-        "fr": "Pour une enceinte que la recherche ne trouve pas : l'adresse IP d'un appareil Google Cast, ou l'URL d'une description UPnP. Séparez plusieurs entrées par des virgules.",
-        "de": "Für einen Lautsprecher, den die Suche nicht findet: die IP-Adresse eines Google-Cast-Geräts oder die URL einer UPnP-Beschreibung. Mehrere Einträge mit Kommas trennen.",
-        "es": "Para un altavoz que la búsqueda no encuentra: la dirección IP de un dispositivo Google Cast o la URL de una descripción UPnP. Separe varias entradas con comas."
+        "en": "For a speaker the scan does not find: the IP address of a Sonos or Google Cast device, or the URL of a UPnP description. Separate several entries with commas.",
+        "fr": "Pour une enceinte que la recherche ne trouve pas : l'adresse IP d'une Sonos ou d'un appareil Google Cast, ou l'URL d'une description UPnP. Séparez plusieurs entrées par des virgules.",
+        "de": "Für einen Lautsprecher, den die Suche nicht findet: die IP-Adresse eines Sonos- oder Google-Cast-Geräts oder die URL einer UPnP-Beschreibung. Mehrere Einträge mit Kommas trennen.",
+        "es": "Para un altavoz que la búsqueda no encuentra: la dirección IP de un Sonos o de un dispositivo Google Cast, o la URL de una descripción UPnP. Separe varias entradas con comas."
       },
       "placeholder": {
         "en": "e.g. 192.168.1.20, http://192.168.1.30:1400/xml/device_description.xml",
