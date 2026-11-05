@@ -1,6 +1,6 @@
 {
   "name": "gladys-radioplayer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "description": "Gladys Assistant integration: play the web radios of your country on your Google Cast, Sonos and UPnP/DLNA speakers.",
   "type": "module",

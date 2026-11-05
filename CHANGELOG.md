@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-11-05
+
 ### Fixed
 
 - A Sonos added by its IP address in **Speakers added by hand** was taken
@@ -116,7 +118,8 @@ the notes of the version's GitHub Release.
 - English, French, German and Spanish everywhere: configuration, messages,
   widgets and documentation.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/gboulvin/Gladys-RadioPlayer/compare/v1.0.0...v1.1.0
